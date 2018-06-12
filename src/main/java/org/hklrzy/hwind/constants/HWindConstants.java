@@ -14,7 +14,9 @@ public class HWindConstants {
 
     public static final String HWIND_CONFIG_METHOD = "method";
 
-    public static final String HWIND_CONFIG_INTERCEPTOR_DEFINE = "interceptor_define";
+    public static final String HWIND_CONFIG_INTERCEPTOR_DEFINE = "interceptor-define";
 
-    public static final String HWIND_CONFIG_INTERCEPTOR_STACK = "interceptor_stack";
+    public static final String HWIND_CONFIG_INTERCEPTOR_STACK = "interceptor-stack";
+
+    public static final String HWINW_CONFIG_SCAN = "hwind-scan";
 }

@@ -84,5 +84,12 @@ public class ElementParser {
         }).collect(Collectors.toList());
     }
 
+    public List<String> parseBasePackages(List<Element> elements) {
+        if (CollectionUtils.isEmpty(elements)) {
+            return null;
+        }
+        return elements.stream().map(element -> element.getAttributeValue(HWindConstants.HWIND_CONFIG_NAME)).collect(Collectors.toList());
+    }
+
 
 }

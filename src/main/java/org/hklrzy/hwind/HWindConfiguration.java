@@ -1,10 +1,12 @@
 package org.hklrzy.hwind;
 
 import com.google.common.base.Strings;
+import org.apache.commons.collections4.CollectionUtils;
 import org.hklrzy.hwind.constants.HWindConstants;
 import org.hklrzy.hwind.interceptor.InterceptorDefine;
 import org.hklrzy.hwind.interceptor.InterceptorStack;
 import org.hklrzy.hwind.parse.ElementParser;
+import org.hklrzy.hwind.scan.ConfigurationScanner;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -34,7 +36,6 @@ public class HWindConfiguration {
     public HWindConfiguration(String path) throws Exception {
         this.path = path;
         parseConfiguration();
-
     }
 
     private void parseConfiguration() throws Exception {
@@ -47,8 +48,11 @@ public class HWindConfiguration {
         ElementParser elementParser = ElementParser.instance();
         this.interceptorDefines = elementParser.parseInterceptorDefines(root.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR_DEFINE));
         this.interceptorStacks = elementParser.parseInterceptorStacks(root.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR_STACK));
-
-
+        this.basePackages = elementParser.parseBasePackages(root.getChildren(HWindConstants.HWINW_CONFIG_SCAN));
+        if (CollectionUtils.isNotEmpty(basePackages)) {
+            ConfigurationScanner configurationScanner = new ConfigurationScanner(this);
+            configurationScanner.scan();
+        }
     }
 
 

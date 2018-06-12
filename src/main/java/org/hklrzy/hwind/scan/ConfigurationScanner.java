@@ -10,23 +10,21 @@ import java.util.List;
  * Created 2018/1/11.
  * Author ke.hao
  */
-public class ConfigrationScanner {
+public class ConfigurationScanner {
 
     private List<String> basePackages;
     private HWindConfiguration configuration;
 
 
-    public ConfigrationScanner(HWindConfiguration configuration) {
+    public ConfigurationScanner(HWindConfiguration configuration) {
         this.configuration = configuration;
         this.basePackages = configuration.getBasePackages();
     }
 
     public void scan() {
-        if (!CollectionUtils.isEmpty(basePackages)) {
+        if (CollectionUtils.isNotEmpty(basePackages)) {
             ClassListener classListener = new DefaultClassListener();
-            basePackages.forEach(basePackage -> {
-                PackageScanner.scan(basePackage, classListener);
-            });
+            basePackages.forEach(basePackage -> PackageScanner.scan(basePackage, classListener));
         }
     }
 
