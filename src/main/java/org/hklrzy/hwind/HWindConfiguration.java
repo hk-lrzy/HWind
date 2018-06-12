@@ -1,7 +1,10 @@
 package org.hklrzy.hwind;
 
 import com.google.common.base.Strings;
+import org.hklrzy.hwind.constants.HWindConstants;
 import org.hklrzy.hwind.interceptor.InterceptorDefine;
+import org.hklrzy.hwind.interceptor.InterceptorStack;
+import org.hklrzy.hwind.parse.ElementParser;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -23,20 +26,31 @@ public class HWindConfiguration {
     private static final String DEFAULT_CONFIG_NAME = "hwind.xml";
 
     private String path;
-    private List<InterceptorDefine> interceptorDefines;
     private List<Pack> packs;
+    private List<InterceptorDefine> interceptorDefines;
+    private List<InterceptorStack> interceptorStacks;
+    private List<String> basePackages;
 
     public HWindConfiguration(String path) throws Exception {
         this.path = path;
+        parseConfiguration();
+
+    }
+
+    private void parseConfiguration() throws Exception {
         SAXBuilder builder = new SAXBuilder();
         Document document = builder.build(new File(path));
         Element root = document.getRootElement();
         if (root == null) {
-            throw new RuntimeException("read config file error");
-
+            throw new RuntimeException(String.format("HWind parse path [ %s ] with SAXBuilder failed", this.path));
         }
+        ElementParser elementParser = ElementParser.instance();
+        this.interceptorDefines = elementParser.parseInterceptorDefines(root.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR_DEFINE));
+        this.interceptorStacks = elementParser.parseInterceptorStacks(root.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR_STACK));
+
 
     }
+
 
     public static HWindConfiguration newClassPathConfiguration(String config) {
         config = Strings.isNullOrEmpty(config) ? DEFAULT_CONFIG_NAME : config;
@@ -56,4 +70,9 @@ public class HWindConfiguration {
     public List<Pack> getPacks() {
         return packs;
     }
+
+    public List<String> getBasePackages() {
+        return basePackages;
+    }
+
 }

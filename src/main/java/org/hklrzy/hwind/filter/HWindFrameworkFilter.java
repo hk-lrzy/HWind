@@ -16,7 +16,7 @@ import java.io.IOException;
  * HWind框架的核心主类用户初始化filter以及url的dispatcher
  * </p>
  */
-public class HWindFarmeworkFilter implements Filter {
+public class HWindFrameworkFilter implements Filter {
     private static final String CONFIG_NAME = "config";
     private HWindApplicationContext applicationContext;
 

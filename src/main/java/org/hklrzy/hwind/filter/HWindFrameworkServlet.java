@@ -11,6 +11,6 @@ import java.io.IOException;
  * Created 2018/6/11.
  * Author ke.hao
  */
-public class HWindFarmeworkServlet extends HttpServlet {
+public class HWindFrameworkServlet extends HttpServlet {
 
 }
