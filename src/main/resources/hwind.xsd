@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<!-- interceptor def -->
+	<xs:element name="interceptor-def">
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+			<xs:attribute name="class" type="xs:string" use="required"></xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<!-- interceptor stack -->
+	<xs:element name="interceptor-stack">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="interceptor"></xs:element>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<!-- interceptor -->
+	<xs:element name="interceptor">
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<!-- require -->
+	<xs:element name="require">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="param">
+					<xs:complexType>
+						<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<!-- channel -->
+	<xs:element name="channel">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="interceptor"></xs:element>
+				<xs:element ref="require" maxOccurs="1"></xs:element>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+			<xs:attribute name="class" type="xs:string" use="required"></xs:attribute>
+			<xs:attribute name="method" type="xs:string" use="required"></xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<!-- pack -->
+	<xs:element name="pack">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="interceptor-def"></xs:element>
+				<xs:element ref="interceptor-stack"></xs:element>
+				<xs:element ref="interceptor"></xs:element>
+				
+				<xs:element name="default-class" maxOccurs="1">
+					<xs:complexType>
+						<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				
+				<xs:element ref="channel"></xs:element>
+			</xs:sequence>
+			
+			<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+			<xs:attribute name="namespace" type="xs:string" use="required"></xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<!-- Start -->
+	<xs:element name="config">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="constant">
+					<xs:complexType>
+						<xs:attribute name="name" use="required"></xs:attribute>
+						<xs:attribute name="value" use="required"></xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				
+				<xs:element ref="interceptor-def"></xs:element>
+				<xs:element ref="interceptor-stack"></xs:element>
+				<xs:element ref="interceptor"></xs:element>
+
+				<xs:element ref="pack"></xs:element>
+
+				<xs:element name="include">
+					<xs:complexType>
+						<xs:attribute name="src" type="xs:string" use="required"></xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+		
+	</xs:element>
+</xs:schema>
