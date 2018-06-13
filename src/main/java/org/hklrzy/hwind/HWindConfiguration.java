@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.net.URL;
 import java.util.List;
 
 
@@ -38,6 +39,11 @@ public class HWindConfiguration {
         parseConfiguration();
     }
 
+    /**
+     * 解析配置文件以及扫描目录信息
+     *
+     * @throws Exception
+     */
     private void parseConfiguration() throws Exception {
         SAXBuilder builder = new SAXBuilder();
         Document document = builder.build(new File(path));
@@ -49,9 +55,10 @@ public class HWindConfiguration {
         this.interceptorDefines = elementParser.parseInterceptorDefines(root.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR_DEFINE));
         this.interceptorStacks = elementParser.parseInterceptorStacks(root.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR_STACK));
         this.basePackages = elementParser.parseBasePackages(root.getChildren(HWindConstants.HWINW_CONFIG_SCAN));
+        this.packs = elementParser.parsePacks(root.getChildren(HWindConstants.HWIND_CONFIG_PACK));
         if (CollectionUtils.isNotEmpty(basePackages)) {
             ConfigurationScanner configurationScanner = new ConfigurationScanner(this);
-            configurationScanner.scan();
+            //configurationScanner.scan();
         }
     }
 
@@ -59,11 +66,14 @@ public class HWindConfiguration {
     public static HWindConfiguration newClassPathConfiguration(String config) {
         config = Strings.isNullOrEmpty(config) ? DEFAULT_CONFIG_NAME : config;
         try {
-            return new HWindConfiguration(HWindConfiguration.class.getClassLoader().getResource(config).getPath());
+            ClassLoader classLoader = HWindConfiguration.class.getClassLoader();
+            URL resource = classLoader.getResource(config);
+            String path = HWindConfiguration.class.getClassLoader().getResource(config).getPath();
+            return new HWindConfiguration(path);
         } catch (Exception e) {
             logger.error("HWind configuration file [ {} ] not founded", config, e);
+            throw new IllegalArgumentException(e);
         }
-        return null;
     }
 
 

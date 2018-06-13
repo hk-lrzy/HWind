@@ -1,6 +1,7 @@
 package org.hklrzy.hwind;
 
 import org.hklrzy.hwind.interceptor.InterceptorDefine;
+import org.hklrzy.hwind.interceptor.InterceptorStack;
 
 import java.util.List;
 
@@ -14,6 +15,8 @@ public class Pack {
     private String namespace;
 
     private List<InterceptorDefine> interceptorDefines;
+    private List<InterceptorStack> interceptorStacks;
+    private List<String> interceptorRefName;
     private String defaultClassName;
 
     private List<HWindChannel> channels;
@@ -56,5 +59,21 @@ public class Pack {
 
     public void setChannels(List<HWindChannel> channels) {
         this.channels = channels;
+    }
+
+    public List<InterceptorStack> getInterceptorStacks() {
+        return interceptorStacks;
+    }
+
+    public void setInterceptorStacks(List<InterceptorStack> interceptorStacks) {
+        this.interceptorStacks = interceptorStacks;
+    }
+
+    public List<String> getInterceptorRefName() {
+        return interceptorRefName;
+    }
+
+    public void setInterceptorRefName(List<String> interceptorRefName) {
+        this.interceptorRefName = interceptorRefName;
     }
 }

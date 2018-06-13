@@ -57,7 +57,7 @@ public class ChannelContext {
         for (Pack pack : configuration.getPacks()) {
             for (HWindChannel channel : pack.getChannels()) {
                 channel.setPack(pack);
-                channels.put(channel.getName(), channel);
+                channels.put(channel.getCanonicalName(), channel);
             }
         }
     }

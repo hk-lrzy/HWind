@@ -55,12 +55,14 @@ public class HWindApplicationContext {
          */
         interceptorContext = InterceptorContext.getInterceptorContext();
         interceptorContext.initInterceptorContext(configuration);
+        channelContext = ChannelContext.instance();
+        channelContext.init(configuration);
     }
 
     public HWindContext createContext(HttpServletRequest request, HttpServletResponse response) {
         String uri = request.getRequestURI();
         HWindChannel channel = channelContext.getChannel(uri);
-
-        return null;
+        HWindContext hWindContext = new HWindContext(request, response, channel);
+        return hWindContext;
     }
 }

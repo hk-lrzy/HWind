@@ -3,6 +3,7 @@ package org.hklrzy.hwind.interceptor;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.apache.commons.collections4.CollectionUtils;
 import org.hklrzy.hwind.HWindConfiguration;
 import org.hklrzy.hwind.Pack;
 import org.slf4j.Logger;
@@ -37,13 +38,16 @@ public class InterceptorContext {
     }
 
     public void initInterceptorContext(HWindConfiguration configuration) {
-        Preconditions.checkNotNull(configuration, "configuration is null");
+        Preconditions.checkNotNull(configuration, "HWind configuration can't be null");
 
         /*
         初始化拦截器
          */
         initInterceptors(configuration);
 
+    }
+
+    private void initChannel(HWindConfiguration configuration) {
 
     }
 
@@ -64,15 +68,11 @@ public class InterceptorContext {
     }
 
     private void initInterceptors(String namespace, List<InterceptorDefine> interceptors) {
-        if (interceptors == null || interceptors.size() == 0) {
-            logger.info("HWind has no interceptors");
+        if (CollectionUtils.isEmpty(interceptors)) {
+            logger.debug("HWind has no interceptors");
             return;
         }
-        Map<String, HWindInterceptor> interceptorMap = this.interceptors.get(namespace);
-        if (interceptorMap == null) {
-            interceptorMap = Maps.newHashMap();
-            this.interceptors.put(namespace, interceptorMap);
-        }
+        Map<String, HWindInterceptor> interceptorMap = this.interceptors.computeIfAbsent(namespace, k -> Maps.newHashMap());
 
         for (InterceptorDefine interceptorDefine : interceptors) {
             HWindInterceptor interceptor = interceptorFactory.getInterceptor(interceptorDefine);

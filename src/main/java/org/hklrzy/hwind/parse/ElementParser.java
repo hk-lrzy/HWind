@@ -3,6 +3,7 @@ package org.hklrzy.hwind.parse;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hklrzy.hwind.HWindChannel;
+import org.hklrzy.hwind.Pack;
 import org.hklrzy.hwind.constants.HWindConstants;
 import org.hklrzy.hwind.interceptor.InterceptorDefine;
 import org.hklrzy.hwind.interceptor.InterceptorStack;
@@ -89,6 +90,26 @@ public class ElementParser {
             return null;
         }
         return elements.stream().map(element -> element.getAttributeValue(HWindConstants.HWIND_CONFIG_NAME)).collect(Collectors.toList());
+    }
+
+    public List<Pack> parsePacks(List<Element> elements) {
+        if (CollectionUtils.isEmpty(elements)) {
+            return null;
+        }
+        return elements.parallelStream().map(element -> {
+            Pack pack = new Pack();
+            pack.setName(element.getAttributeValue(HWindConstants.HWIND_CONFIG_NAME));
+            pack.setNamespace(element.getAttributeValue(HWindConstants.HWIND_CONFIG_NAME_SPACE));
+            Element defaultClass = element.getChild(HWindConstants.HWIND_CONFIG_DEFAULT_CLASS);
+
+            if (defaultClass != null) {
+                pack.setDefaultClassName(defaultClass.getAttributeValue(HWindConstants.HWIND_CONFIG_NAME));
+            }
+            pack.setInterceptorDefines(parseInterceptorDefines(element.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR_DEFINE)));
+            pack.setInterceptorStacks(parseInterceptorStacks(element.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR_STACK)));
+            pack.setInterceptorRefName(parseInterceptorNames(element.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR)));
+            return pack;
+        }).collect(Collectors.toList());
     }
 
 

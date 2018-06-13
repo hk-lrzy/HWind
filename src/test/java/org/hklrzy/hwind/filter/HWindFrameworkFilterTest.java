@@ -2,7 +2,7 @@ package org.hklrzy.hwind.filter;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import javax.servlet.ServletException;
 
 /**
  * Created 2018/6/12.
@@ -11,8 +11,10 @@ import static org.junit.Assert.*;
 public class HWindFrameworkFilterTest {
 
     @Test
-    public void init() {
+    public void init() throws ServletException {
         HWindFrameworkFilter hWindFrameworkFilter = new HWindFrameworkFilter();
+        hWindFrameworkFilter.init(null);
+
     }
 
     @Test

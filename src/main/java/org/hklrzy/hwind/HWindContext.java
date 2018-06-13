@@ -18,5 +18,39 @@ public class HWindContext {
 
     private HWindChannel channel;
 
+    public HWindContext(HttpServletRequest request, HttpServletResponse response, HWindChannel channel) {
+        this.request = request;
+        this.response = response;
+        this.channel = channel;
+    }
 
+
+    public void invoke() {
+        this.channel.invoke(this);
+    }
+
+
+    public HttpServletRequest getRequest() {
+        return request;
+    }
+
+    public void setRequest(HttpServletRequest request) {
+        this.request = request;
+    }
+
+    public HttpServletResponse getResponse() {
+        return response;
+    }
+
+    public void setResponse(HttpServletResponse response) {
+        this.response = response;
+    }
+
+    public HWindChannel getChannel() {
+        return channel;
+    }
+
+    public void setChannel(HWindChannel channel) {
+        this.channel = channel;
+    }
 }

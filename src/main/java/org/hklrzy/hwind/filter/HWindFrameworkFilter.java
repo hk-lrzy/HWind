@@ -3,6 +3,7 @@ package org.hklrzy.hwind.filter;
 
 import org.hklrzy.hwind.HWindApplicationContext;
 import org.hklrzy.hwind.HWindConfiguration;
+import org.hklrzy.hwind.HWindContext;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -20,8 +21,9 @@ public class HWindFrameworkFilter implements Filter {
     private static final String CONFIG_NAME = "config";
     private HWindApplicationContext applicationContext;
 
+
     public void init(FilterConfig config) throws ServletException {
-        String configFilePath = config.getInitParameter(CONFIG_NAME);
+          String configFilePath = config.getInitParameter(CONFIG_NAME);
 
         /*
             扫描文件以及目录信息
@@ -56,7 +58,7 @@ public class HWindFrameworkFilter implements Filter {
      * @param response
      */
     private void dispatcher(HttpServletRequest request, HttpServletResponse response) {
-        applicationContext.createContext(request, response);
+        HWindContext context = applicationContext.createContext(request, response);
     }
 
     public void destroy() {

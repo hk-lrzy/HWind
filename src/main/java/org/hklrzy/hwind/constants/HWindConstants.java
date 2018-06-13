@@ -8,7 +8,11 @@ public class HWindConstants {
 
     public static final String HWIND_CONFIG_NAME = "name";
 
+    public static final String HWIND_CONFIG_NAME_SPACE = "namespace";
+
     public static final String HWIND_CONFIG_CLASS = "class";
+
+    public static final String HWIND_CONFIG_DEFAULT_CLASS = "default-class";
 
     public static final String HWIND_CONFIG_INTERCEPTOR = "interceptor";
 
@@ -19,4 +23,7 @@ public class HWindConstants {
     public static final String HWIND_CONFIG_INTERCEPTOR_STACK = "interceptor-stack";
 
     public static final String HWINW_CONFIG_SCAN = "hwind-scan";
+
+    public static final String HWIND_CONFIG_PACK = "pack";
+
 }
