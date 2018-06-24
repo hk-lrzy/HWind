@@ -26,4 +26,7 @@ public class HWindConstants {
 
     public static final String HWIND_CONFIG_PACK = "pack";
 
+
+    public static final String SET_METHOD_PREFIX = "set";
+
 }

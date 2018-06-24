@@ -59,6 +59,8 @@ public class HWindFrameworkFilter implements Filter {
      */
     private void dispatcher(HttpServletRequest request, HttpServletResponse response) {
         HWindContext context = applicationContext.createContext(request, response);
+        
+
     }
 
     public void destroy() {

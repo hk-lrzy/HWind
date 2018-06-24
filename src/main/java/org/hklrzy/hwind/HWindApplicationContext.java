@@ -60,9 +60,23 @@ public class HWindApplicationContext {
     }
 
     public HWindContext createContext(HttpServletRequest request, HttpServletResponse response) {
-        String uri = request.getRequestURI();
+        String uri = parse(request);
+        logger.info("HWind parse uri [ {} ] from request", request.getRequestURI());
         HWindChannel channel = channelContext.getChannel(uri);
+        if (channel == null) {
+            return null;
+        }
         HWindContext hWindContext = new HWindContext(request, response, channel);
         return hWindContext;
+    }
+
+    /**
+     * 解析request请求的uri 查找相应的Channel
+     *
+     * @param request
+     * @return
+     */
+    private String parse(HttpServletRequest request) {
+        return request.getRequestURI();
     }
 }
