@@ -63,11 +63,15 @@ public class HWindApplicationContext {
         String uri = parse(request);
         logger.info("HWind parse uri [ {} ] from request", request.getRequestURI());
         HWindChannel channel = channelContext.getChannel(uri);
-        if (channel == null) {
-            return null;
-        }
-        HWindContext hWindContext = new HWindContext(request, response, channel);
-        return hWindContext;
+        return channel == null ? createDefaultContext(request, response) : createContext(request, response, channel);
+    }
+
+    private HWindContext createContext(HttpServletRequest request, HttpServletResponse response, HWindChannel channel) {
+        return new HWindContext(request, response, channel);
+    }
+
+    private HWindContext createDefaultContext(HttpServletRequest request, HttpServletResponse response) {
+        return new HWindContext(request, response, null);
     }
 
     /**

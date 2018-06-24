@@ -23,7 +23,7 @@ public class HWindFrameworkFilter implements Filter {
 
 
     public void init(FilterConfig config) throws ServletException {
-          String configFilePath = config.getInitParameter(CONFIG_NAME);
+        String configFilePath = config.getInitParameter(CONFIG_NAME);
 
         /*
             扫描文件以及目录信息
@@ -59,8 +59,8 @@ public class HWindFrameworkFilter implements Filter {
      */
     private void dispatcher(HttpServletRequest request, HttpServletResponse response) {
         HWindContext context = applicationContext.createContext(request, response);
-        
-
+        context.invoke();
+        context.doCallBack();
     }
 
     public void destroy() {

@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hklrzy.hwind.constants.HWindConstants;
-import org.hklrzy.hwind.utils.TypeCheckUtils;
+import org.hklrzy.hwind.utils.TypeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +43,7 @@ public class HWindChannel {
         try {
             Map<String, String[]> parameterMap = context.getRequest().getParameterMap();
             Class<?> proxyClazz = Class.forName(className);
-            Method method = proxyClazz.getMethod(methodName);
+            Method method = proxyClazz.getMethod(methodName, (Class<?>[]) TypeUtils.listToArray(parameterTypes));
             Object proxy = proxyClazz.newInstance();
             return method.invoke(proxy, getParameterArray(method, context.getRequest().getParameterMap()));
         } catch (Exception e) {
@@ -65,7 +65,7 @@ public class HWindChannel {
         for (Parameter parameter : parameters) {
             String parameterName = parameter.getName();
             Class<?> parameterType = parameter.getType();
-            if (TypeCheckUtils.isStringOrWrapperType(parameterType)) {
+            if (TypeUtils.isStringOrWrapperType(parameterType)) {
                 parameterLists.add(parametersMap.get(parameterName));
             } else {
                 Object paramObject = parameterType.newInstance();
@@ -81,7 +81,7 @@ public class HWindChannel {
             for (Field field : fields) {
                 Class<?> fieldType = field.getType();
                 String name = field.getName();
-                if (TypeCheckUtils.isStringOrWrapperType(fieldType)) {
+                if (TypeUtils.isStringOrWrapperType(fieldType)) {
                     Method method = clazz.getMethod(getTypeName(fieldType, name), fieldType);
                     if (method != null)
                         method.invoke(object, parametersMap.get(name));
@@ -106,7 +106,7 @@ public class HWindChannel {
         if (Strings.isNullOrEmpty(fieldName)) {
             throw new IllegalArgumentException();
         }
-        if (TypeCheckUtils.isBoolWrapperType(fieldType)) {
+        if (TypeUtils.isBoolWrapperType(fieldType)) {
             if (fieldName.toUpperCase().startsWith("IS")) {
                 fieldName = fieldName.substring(2);
             }

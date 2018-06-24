@@ -18,6 +18,10 @@ public class HWindContext {
 
     private HWindChannel channel;
 
+    private Object callback;
+
+    private Object result;
+
     public HWindContext(HttpServletRequest request, HttpServletResponse response, HWindChannel channel) {
         this.request = request;
         this.response = response;
@@ -28,6 +32,10 @@ public class HWindContext {
     public void invoke() {
 
         this.channel.invoke(this);
+    }
+
+    public void doCallBack() {
+
     }
 
 
