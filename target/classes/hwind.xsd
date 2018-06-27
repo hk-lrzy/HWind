@@ -45,12 +45,22 @@
         </xs:complexType>
     </xs:element>
 
+
+    <!--参数声明-->
+    <xs:element name="param">
+        <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="class" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
     <!-- channel -->
     <xs:element name="channel">
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="interceptor"></xs:element>
                 <xs:element ref="require" maxOccurs="1"></xs:element>
+                <xs:element ref="param"/>
             </xs:sequence>
             <xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
             <xs:attribute name="class" type="xs:string" use="required"></xs:attribute>

@@ -1,5 +1,6 @@
 package org.hklrzy.hwind.scan.listener;
 
+import org.hklrzy.hwind.Pack;
 import org.hklrzy.hwind.annotation.Chapack;
 import org.hklrzy.hwind.scan.ClassListener;
 
@@ -9,6 +10,8 @@ import org.hklrzy.hwind.scan.ClassListener;
  */
 public class DefaultClassListener implements ClassListener {
 
+    private static final Class<Chapack> DEFAULT_ANNOTATION = Chapack.class;
+
     @Override
     public void listen(Class<?> clazz) {
         if (clazz.getAnnotation(Chapack.class) != null) {
@@ -17,6 +20,9 @@ public class DefaultClassListener implements ClassListener {
     }
 
     private void loadPack(Class<?> clazz) {
-
+        Chapack annotation = clazz.getAnnotation(DEFAULT_ANNOTATION);
+        Pack pack = new Pack();
     }
+
+
 }

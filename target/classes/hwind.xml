@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<config  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance hwind.xsd"
-	xsi:noNamespaceSchemaLocation="hwind.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance hwind.xsd"
+        xsi:noNamespaceSchemaLocation="hwind.xsd">
 
     <constant name="scanner.pack" value="cc.hotice.wind"/>
 
-	<interceptor-def name="interceptorA" class="cc.hotice.wind.interceptor.InterceptorA"/>
-	<interceptor-stack name="interceptorStackA">
-		<interceptor ref="interceptorA"/>
-	</interceptor-stack>
+    <interceptor-def name="interceptorA" class="cc.hotice.wind.interceptor.InterceptorA"/>
+    <interceptor-stack name="interceptorStackA">
+        <interceptor ref="interceptorA"/>
+    </interceptor-stack>
 
 
-
-
-	<interceptor ref="interceptorA"/>
+    <interceptor ref="interceptorA"/>
 
     <pack namespace="/a">
         <channel namespace="/aaa" class="cc.hotice.wind.channel.ChannelA" method="a">
-            <interceptor ref="interceptorStackA"/>
+            <param name="" class=""/>
         </channel>
     </pack>
 

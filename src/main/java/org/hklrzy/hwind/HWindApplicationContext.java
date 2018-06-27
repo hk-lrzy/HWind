@@ -4,6 +4,8 @@ import org.hklrzy.hwind.channel.ChannelContext;
 import org.hklrzy.hwind.interceptor.InterceptorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -20,8 +22,8 @@ public class HWindApplicationContext {
     private static HWindApplicationContext applicationContext;
     private static final Object lock = new Object();
     private HWindConfiguration configuration;
-    private ServletContext servletContext;
     private InterceptorContext interceptorContext;
+    private WebApplicationContext webApplicationContext;
     private ChannelContext channelContext;
 
 
@@ -41,7 +43,8 @@ public class HWindApplicationContext {
 
     public void init(HWindConfiguration configuration, ServletContext servletContext) {
         this.configuration = configuration;
-        this.servletContext = servletContext;
+        //this.servletContext = servletContext;
+        this.webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
         initFramework();
     }
 
@@ -83,4 +86,5 @@ public class HWindApplicationContext {
     private String parse(HttpServletRequest request) {
         return request.getRequestURI();
     }
+
 }

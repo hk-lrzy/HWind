@@ -1,5 +1,6 @@
 package org.hklrzy.hwind.scan;
 
+import org.hklrzy.hwind.exception.HWindScanException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +25,7 @@ public class PackageScanner {
             scan(packageName, url.toURI(), classListener);
         } catch (Exception e) {
             logger.error("scan package name [ {} ] failed", packageName);
+            throw new HWindScanException();
         }
     }
 

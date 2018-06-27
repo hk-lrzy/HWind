@@ -58,7 +58,7 @@ public class HWindConfiguration {
         this.packs = elementParser.parsePacks(root.getChildren(HWindConstants.HWIND_CONFIG_PACK));
         if (CollectionUtils.isNotEmpty(basePackages)) {
             ConfigurationScanner configurationScanner = new ConfigurationScanner(this);
-            //configurationScanner.scan();
+            configurationScanner.scan();
         }
     }
 

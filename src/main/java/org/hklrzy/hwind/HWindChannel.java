@@ -29,6 +29,8 @@ public class HWindChannel {
 
     private String methodName;
 
+    private List<String> parameterNames;
+
     private List<Class<?>> parameterTypes;
 
     private List<String> interceptorRefNames;
@@ -166,4 +168,19 @@ public class HWindChannel {
         this.requireParams = requireParams;
     }
 
+    public List<String> getParameterNames() {
+        return parameterNames;
+    }
+
+    public void setParameterNames(List<String> parameterNames) {
+        this.parameterNames = parameterNames;
+    }
+
+    public List<Class<?>> getParameterTypes() {
+        return parameterTypes;
+    }
+
+    public void setParameterTypes(List<Class<?>> parameterTypes) {
+        this.parameterTypes = parameterTypes;
+    }
 }
