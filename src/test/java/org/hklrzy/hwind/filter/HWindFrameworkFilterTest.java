@@ -1,5 +1,7 @@
 package org.hklrzy.hwind.filter;
 
+import org.hklrzy.hwind.HWindApplicationContext;
+import org.hklrzy.hwind.HWindConfiguration;
 import org.junit.Test;
 
 import javax.servlet.ServletException;
@@ -11,10 +13,10 @@ import javax.servlet.ServletException;
 public class HWindFrameworkFilterTest {
 
     @Test
-    public void init() throws ServletException {
-        HWindFrameworkFilter hWindFrameworkFilter = new HWindFrameworkFilter();
-        hWindFrameworkFilter.init(null);
-
+    public void init() throws Exception {
+        HWindConfiguration configuration = HWindConfiguration.newClassPathConfiguration("hwind.xml");
+        HWindApplicationContext applicationContext = HWindApplicationContext.getApplicationContext();
+        applicationContext.init(configuration,null);
     }
 
     @Test

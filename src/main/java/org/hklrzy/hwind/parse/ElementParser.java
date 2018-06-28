@@ -83,6 +83,7 @@ public class ElementParser {
         return elements.stream().map(element -> {
             HWindChannel channel = new HWindChannel();
             channel.setName(element.getAttributeValue(HWindConstants.HWIND_CONFIG_NAME));
+            channel.setMethodName(element.getAttributeValue(HWindConstants.HWIND_CONFIG_METHOD));
             channel.setClassName(element.getAttributeValue(HWindConstants.HWIND_CONFIG_CLASS));
             channel.setInterceptorRefNames(parseInterceptorNames(element.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR)));
             parseParams(element.getChildren(HWindConstants.HWDIN_CONFIG_PARAM), channel);

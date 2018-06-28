@@ -13,8 +13,8 @@
     <interceptor ref="interceptorA"/>
 
     <pack namespace="/a">
-        <channel namespace="/aaa" class="cc.hotice.wind.channel.ChannelA" method="a">
-            <param name="" class=""/>
+        <channel name="/test" class="cc.hotice.wind.channel.ChannelA" method="a">
+            <param name="name" class="java.lang.String"/>
         </channel>
     </pack>
 

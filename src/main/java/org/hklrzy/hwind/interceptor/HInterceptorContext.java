@@ -16,23 +16,23 @@ import java.util.Map;
  * Created 2018/1/11.
  * Author ke.hao
  */
-public class InterceptorContext {
+public class HInterceptorContext {
 
     private static Logger logger =
-            LoggerFactory.getLogger(InterceptorContext.class);
+            LoggerFactory.getLogger(HInterceptorContext.class);
     private static final String DEFAULT_NAMESPACE = "/";
-    private static InterceptorContext interceptorContext;
+    private static HInterceptorContext interceptorContext;
     private InterceptorFactory interceptorFactory;
     private Map<String, Map<String, HWindInterceptor>> interceptors = Maps.newHashMap();
 
 
-    private InterceptorContext() {
+    private HInterceptorContext() {
         this.interceptorFactory = InterceptorFactory.getInterceptorFactory();
     }
 
-    public static InterceptorContext getInterceptorContext() {
+    public static HInterceptorContext getInterceptorContext() {
         if (interceptorContext == null) {
-            interceptorContext = new InterceptorContext();
+            interceptorContext = new HInterceptorContext();
         }
         return interceptorContext;
     }
@@ -45,9 +45,6 @@ public class InterceptorContext {
          */
         initInterceptors(configuration);
 
-    }
-
-    private void initChannel(HWindConfiguration configuration) {
 
     }
 

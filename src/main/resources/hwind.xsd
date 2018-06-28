@@ -9,12 +9,6 @@
         </xs:complexType>
     </xs:element>
 
-    <xs:element name="hwind-scan">
-        <xs:complexType>
-            <xs:attribute name="name" type="xs:string" use="required"/>
-        </xs:complexType>
-    </xs:element>
-
     <!--拦截器栈-->
     <xs:element name="interceptor-stack">
         <xs:complexType>

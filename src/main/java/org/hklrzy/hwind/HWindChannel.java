@@ -37,17 +37,22 @@ public class HWindChannel {
 
     private List<String> requireParams;
 
-    private Pack pack;
+    private Object channelHandler;
 
+    private Pack pack;
 
     @SuppressWarnings("all")
     public Object invoke(HWindContext context) {
         try {
+            Class<?> handlerClass = channelHandler == null ? Class.forName(className) : channelHandler.getClass();
+            channelHandler = channelHandler == null ? handlerClass.newInstance() : channelHandler;
+
             Map<String, String[]> parameterMap = context.getRequest().getParameterMap();
-            Class<?> proxyClazz = Class.forName(className);
-            Method method = proxyClazz.getMethod(methodName, (Class<?>[]) TypeUtils.listToArray(parameterTypes));
-            Object proxy = proxyClazz.newInstance();
-            return method.invoke(proxy, getParameterArray(method, context.getRequest().getParameterMap()));
+
+            Method method = handlerClass.getMethod(methodName, (Class<?>[]) TypeUtils.listToArray(parameterTypes));
+
+            return method.invoke(channelHandler, getParameterArray(method, context.getRequest().getParameterMap()));
+
         } catch (Exception e) {
             logger.error("HWind invoke channel [ {} ] and class name [ {} ] failed", name, className);
             throw new RuntimeException(e.getMessage());
@@ -182,5 +187,13 @@ public class HWindChannel {
 
     public void setParameterTypes(List<Class<?>> parameterTypes) {
         this.parameterTypes = parameterTypes;
+    }
+
+    public Object getChannelHandler() {
+        return channelHandler;
+    }
+
+    public void setChannelHandler(Object channelHandler) {
+        this.channelHandler = channelHandler;
     }
 }

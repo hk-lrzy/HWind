@@ -50,8 +50,10 @@ public class HWindFrameworkFilter implements Filter {
      * 1. 希望实现对方法参数的注入 todo
      * 且将返回值进行处理
      * 返回值处理方法：
-     * 1.页面的跳转 todo
-     * 2.实现类似于response的定制化返回方法 todo
+     *  1>.页面的跳转 todo
+     *  2>.实现类似于response的定制化返回方法 todo
+     * 2. 融合spring-context spring-web spring-beans这几个基本的部分
+     *  1>. 可以省去创建bean的过程，本身bean已经在spring的顶级容器中生成，mvc模块的作用就是在启动的时候解析相应的注解，通过容器中的bean做映射 todo
      * </p>
      *
      * @param request
