@@ -26,6 +26,7 @@ public class HWindFrameworkServlet extends HttpServlet {
 
         /*
             扫描文件以及目录信息
+            todo 使用spring.handler来启动配置
          */
         HWindConfiguration hWindConfiguration = HWindConfiguration.newClassPathConfiguration(configFilePath);
 
@@ -58,6 +59,7 @@ public class HWindFrameworkServlet extends HttpServlet {
      * @param response
      */
     private void doDispatch(HttpServletRequest request, HttpServletResponse response) {
+
         HWindContext context = applicationContext.createContext(request, response);
         context.invoke();
         context.doCallBack();

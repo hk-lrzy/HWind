@@ -12,6 +12,7 @@ import java.util.List;
 /**
  * Created 2018/1/11.
  * Author ke.hao
+ * 拦截器执行链
  */
 public class HWindInterceptorChain {
 
