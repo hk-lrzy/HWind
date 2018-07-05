@@ -1,28 +1,27 @@
-package org.hklrzy.hwind.filter;
-
+package org.hklrzy.hwind.servlet;
 
 import org.hklrzy.hwind.HWindApplicationContext;
 import org.hklrzy.hwind.HWindConfiguration;
 import org.hklrzy.hwind.HWindContext;
 
-import javax.servlet.*;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Created 2018/1/11.
+ * Created 2018/6/11.
  * Author ke.hao
- * <p>
- * HWind框架的核心主类用户初始化filter以及url的dispatcher
- * </p>
  */
-public class HWindFrameworkFilter implements Filter {
+public class HWindFrameworkServlet extends HttpServlet {
     private static final String CONFIG_NAME = "config";
     private HWindApplicationContext applicationContext;
 
 
-    public void init(FilterConfig config) throws ServletException {
+    @Override
+    public void init(ServletConfig config) throws ServletException {
         String configFilePath = config.getInitParameter(CONFIG_NAME);
 
         /*
@@ -37,10 +36,9 @@ public class HWindFrameworkFilter implements Filter {
         applicationContext.init(hWindConfiguration, config.getServletContext());
     }
 
-
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        dispatcher((HttpServletRequest) servletRequest, (HttpServletResponse) servletResponse);
-
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doDispatch(req, resp);
     }
 
     /**
@@ -50,21 +48,22 @@ public class HWindFrameworkFilter implements Filter {
      * 1. 希望实现对方法参数的注入 todo
      * 且将返回值进行处理
      * 返回值处理方法：
-     *  1>.页面的跳转 todo
-     *  2>.实现类似于response的定制化返回方法 todo
+     * 1>.页面的跳转 todo
+     * 2>.实现类似于response的定制化返回方法 todo
      * 2. 融合spring-context spring-web spring-beans这几个基本的部分
-     *  1>. 可以省去创建bean的过程，本身bean已经在spring的顶级容器中生成，mvc模块的作用就是在启动的时候解析相应的注解，通过容器中的bean做映射 todo
+     * 1>. 可以省去创建bean的过程，本身bean已经在spring的顶级容器中生成，mvc模块的作用就是在启动的时候解析相应的注解，通过容器中的bean做映射 todo
      * </p>
      *
      * @param request
      * @param response
      */
-    private void dispatcher(HttpServletRequest request, HttpServletResponse response) {
+    private void doDispatch(HttpServletRequest request, HttpServletResponse response) {
         HWindContext context = applicationContext.createContext(request, response);
         context.invoke();
         context.doCallBack();
     }
 
+    @Override
     public void destroy() {
 
     }

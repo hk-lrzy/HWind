@@ -40,13 +40,10 @@ public class HInterceptorContext {
     public void initInterceptorContext(HWindConfiguration configuration) {
         Preconditions.checkNotNull(configuration, "HWind configuration can't be null");
 
-        /*
-        初始化拦截器
-         */
         initInterceptors(configuration);
-
-
+        initInterceptorStack(configuration);
     }
+
 
     /**
      * 初始化拦截器配置
@@ -75,6 +72,10 @@ public class HInterceptorContext {
             HWindInterceptor interceptor = interceptorFactory.getInterceptor(interceptorDefine);
             interceptorMap.put(interceptorDefine.getName(), interceptor);
         }
+    }
+
+    private void initInterceptorStack(HWindConfiguration configuration) {
+        
     }
 
     public HWindInterceptor getHWindInterceptor(String namespace, String name) {

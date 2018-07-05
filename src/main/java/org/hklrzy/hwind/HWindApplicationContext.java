@@ -50,15 +50,24 @@ public class HWindApplicationContext {
     }
 
     /**
-     * 初始化框架规则
+     * 初始化框架
      */
     private void initFramework() {
 
         /*
-         * 初始化拦截器配置
+         * 初始化一些文本信息
          */
+        initInterceptorContext();
+        initChannelContext();
+
+    }
+
+    private void initInterceptorContext() {
         interceptorContext = HInterceptorContext.getInterceptorContext();
         interceptorContext.initInterceptorContext(configuration);
+    }
+
+    private void initChannelContext() {
         channelContext = HChannelContext.getHChannelContext();
         channelContext.init(this);
     }

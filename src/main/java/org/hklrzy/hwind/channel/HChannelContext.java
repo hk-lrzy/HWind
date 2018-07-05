@@ -57,7 +57,7 @@ public class HChannelContext {
             logger.error("HWind init HChannelContext failed because configuration is null");
             throw new IllegalArgumentException("HWind init HChannelContext failed because configuration is null");
         }
-        //channelHandlerFactory = AbstractChannelHandlerFactory.getFactory(applicationContext);
+        channelHandlerFactory = AbstractChannelHandlerFactory.getFactory(applicationContext);
         initInterceptorContext(applicationContext);
         registerChannels(applicationContext);
 

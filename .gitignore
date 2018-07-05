@@ -5,6 +5,8 @@
 # IntelliJ project files
 .idea
 *.iml
+src/test
+target
 out
 gen### Java template
 # Compiled class file

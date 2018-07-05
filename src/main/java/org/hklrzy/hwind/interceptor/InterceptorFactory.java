@@ -27,7 +27,7 @@ public class InterceptorFactory {
                 interceptor = (HWindInterceptor) clazz.newInstance();
             }
         } catch (Exception e) {
-            logger.error("class {} newInstance interceptor failed", interceptorDefine.getClassName());
+            logger.error("interceptor class [ {} ] get instance failed", interceptorDefine.getClassName());
         }
         return interceptor;
     }
