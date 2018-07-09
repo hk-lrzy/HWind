@@ -3,6 +3,8 @@ package org.hklrzy.hwind.servlet;
 import org.hklrzy.hwind.HWindApplicationContext;
 import org.hklrzy.hwind.HWindConfiguration;
 import org.hklrzy.hwind.HWindContext;
+import org.hklrzy.hwind.channel.HChannelContext;
+import org.hklrzy.hwind.interceptor.HWindInterceptorChain;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -60,9 +62,22 @@ public class HWindFrameworkServlet extends HttpServlet {
      */
     private void doDispatch(HttpServletRequest request, HttpServletResponse response) {
 
-        HWindContext context = applicationContext.createContext(request, response);
+/*        HWindContext context = applicationContext.createContext(request, response);
         context.invoke();
-        context.doCallBack();
+        context.doCallBack();*/
+        HWindInterceptorChain chainHandler = getHandler(request);
+
+    }
+
+    /**
+     * 获取HWindInterceptorChain
+     *
+     * @param request
+     * @return
+     */
+    private HWindInterceptorChain getHandler(HttpServletRequest request) {
+        applicationContext.getHandler(request);
+        return null;
     }
 
     @Override

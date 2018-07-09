@@ -2,6 +2,7 @@ package org.hklrzy.hwind;
 
 import org.hklrzy.hwind.channel.HChannelContext;
 import org.hklrzy.hwind.interceptor.HInterceptorContext;
+import org.hklrzy.hwind.interceptor.HWindInterceptorChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
@@ -72,19 +73,33 @@ public class HWindApplicationContext {
         channelContext.init(this);
     }
 
-    public HWindContext createContext(HttpServletRequest request, HttpServletResponse response) {
-        String uri = parse(request);
-        logger.info("HWind parse uri [ {} ] from request", request.getRequestURI());
-        HWindChannel channel = channelContext.getChannel(uri);
-        return channel == null ? createDefaultContext(request, response) : createContext(request, response, channel);
+
+    public HWindInterceptorChain getHandler(HttpServletRequest request) {
+        String lookup = getLookUpPathForRequest(request);
+
+        Object channel = getHandlerInternal(lookup);
+
+        getChannelInterceptorChain(channel, request);
+
+        return null;
     }
 
-    private HWindContext createContext(HttpServletRequest request, HttpServletResponse response, HWindChannel channel) {
-        return new HWindContext(request, response, channel);
+    private HWindInterceptorChain getChannelInterceptorChain(Object channel, HttpServletRequest request) {
+        String lookupPath = getLookUpPathForRequest(request);
+        return null;
     }
 
-    private HWindContext createDefaultContext(HttpServletRequest request, HttpServletResponse response) {
-        return new HWindContext(request, response, null);
+    protected Object getHandlerInternal(String lookup) {
+        HWindChannel channel = channelContext.getChannel(lookup);
+        if (channel == null) {
+            channel = channelContext.getDefaultChannel();
+        }
+        return channel;
+    }
+
+
+    public String getLookUpPathForRequest(HttpServletRequest request) {
+        return request.getRequestURI();
     }
 
     /**

@@ -82,6 +82,10 @@ public class HChannelContext {
         }
     }
 
+    public HWindChannel getDefaultChannel() {
+        return null;
+    }
+
 
     private void initChannelHandler(HWindChannel channel) {
         channel.setChannelHandler(channelHandlerFactory.getChannelHandler(channel));
