@@ -2,5 +2,19 @@
 <hwinds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="hwind.xsd">
 
+    <interceptor-def name="haoke" class="org.hklrzy.hwind.interceptor.HWindInterceptorChain"/>
 
+    <interceptor-stack>
+        <interceptor>
+            <mapping path="/**"/>
+            <exclude-mapping path="/api"/>
+            <interceptor-ref ref="haoke"/>
+        </interceptor>
+    </interceptor-stack>
+
+    <pack namespace="/">
+        <channel namespace="/api" class="com" method="index">
+            <param name="haoke" type="me"/>
+        </channel>
+    </pack>
 </hwinds>

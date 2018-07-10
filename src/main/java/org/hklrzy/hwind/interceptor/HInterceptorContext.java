@@ -4,10 +4,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections4.CollectionUtils;
+import org.hklrzy.hwind.HWindApplicationContext;
 import org.hklrzy.hwind.HWindConfiguration;
 import org.hklrzy.hwind.Pack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 import java.util.Map;
@@ -20,25 +23,30 @@ public class HInterceptorContext {
 
     private static Logger logger =
             LoggerFactory.getLogger(HInterceptorContext.class);
-    private static final String DEFAULT_NAMESPACE = "/";
+
     private static HInterceptorContext interceptorContext;
+    private static final String DEFAULT_NAMESPACE = "/";
+    private HWindApplicationContext windApplicationContext;
     private InterceptorFactory interceptorFactory;
+
+    private Map<String, HWindInterceptor> nameAndInterceptorMap = Maps.newConcurrentMap();
     private Map<String, Map<String, HWindInterceptor>> interceptors = Maps.newHashMap();
 
 
-    private HInterceptorContext() {
+    private HInterceptorContext(HWindApplicationContext windApplicationContext) {
+        this.windApplicationContext = windApplicationContext;
         this.interceptorFactory = InterceptorFactory.getInterceptorFactory();
     }
 
-    public static HInterceptorContext getInterceptorContext() {
+    public static HInterceptorContext getInterceptorContext(HWindApplicationContext windApplicationContext) {
         if (interceptorContext == null) {
-            interceptorContext = new HInterceptorContext();
+            interceptorContext = new HInterceptorContext(windApplicationContext);
         }
         return interceptorContext;
     }
 
     public void initInterceptorContext(HWindConfiguration configuration) {
-        Preconditions.checkNotNull(configuration, "HWind configuration can't be null");
+        Preconditions.checkNotNull(configuration, "hwind configuration can't be null");
 
         initInterceptors(configuration);
         initInterceptorStack(configuration);
@@ -51,31 +59,30 @@ public class HInterceptorContext {
      * @param configuration 拦截器的配置信息
      */
     private void initInterceptors(HWindConfiguration configuration) {
-        initInterceptors(DEFAULT_NAMESPACE, configuration.getInterceptorDefines());
-
-        List<Pack> packs = configuration.getPacks();
-        for (Pack pack : packs) {
-            initInterceptors(pack.getNamespace(), pack.getInterceptorDefines());
-        }
-
-
+        initInterceptors(configuration.getInterceptorDefines());
     }
 
-    private void initInterceptors(String namespace, List<InterceptorDefine> interceptors) {
+
+    /**
+     * 自己用反射实现的简单ioc
+     * todo 使用spring的ioc
+     *
+     * @param interceptors
+     */
+    private void initInterceptors(List<InterceptorDefine> interceptors) {
         if (CollectionUtils.isEmpty(interceptors)) {
             logger.debug("HWind has no interceptors");
             return;
         }
-        Map<String, HWindInterceptor> interceptorMap = this.interceptors.computeIfAbsent(namespace, k -> Maps.newHashMap());
 
         for (InterceptorDefine interceptorDefine : interceptors) {
             HWindInterceptor interceptor = interceptorFactory.getInterceptor(interceptorDefine);
-            interceptorMap.put(interceptorDefine.getName(), interceptor);
+            nameAndInterceptorMap.put(interceptorDefine.getName(), interceptor);
         }
     }
 
     private void initInterceptorStack(HWindConfiguration configuration) {
-        
+
     }
 
     public HWindInterceptor getHWindInterceptor(String namespace, String name) {

@@ -44,6 +44,9 @@ public class ElementParser {
      */
     public List<InterceptorDefine> parseInterceptorDefines(List<Element> elements) {
         if (CollectionUtils.isEmpty(elements)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("hwind elements can't find element [interceptor-def]");
+            }
             return null;
         }
         List<InterceptorDefine> interceptorDefines = Lists.newArrayList();
@@ -70,11 +73,31 @@ public class ElementParser {
         }
         return elements.stream().map(element -> {
             InterceptorStack interceptorStack = new InterceptorStack();
-            interceptorStack.setName(element.getAttributeValue(HWindConstants.HWIND_CONFIG_NAME));
-            interceptorStack.setInterceptorRefNames(parseInterceptorNames(element.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR)));
+            interceptorStack.setInterceptorAdapters(parseInterceptor(element.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR)));
             return interceptorStack;
         }).collect(Collectors.toList());
     }
+
+    public List<InterceptorStack.InterceptorAdapter> parseInterceptor(List<Element> elements) {
+        if (CollectionUtils.isEmpty(elements)) {
+            return null;
+        }
+        return elements.stream().map(element -> {
+            List<Element> mappingElements = element.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR_MAPPING);
+            List<Element> excludeMappingElements = element.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR_EXCLUDE_MAPPING);
+            List<String> mappingValues = mappingElements.stream().map(mappingElement -> mappingElement.getAttributeValue(HWindConstants.HWIND_CONFIG_INTERCEPTOR_PATH)).collect(Collectors.toList());
+            List<String> excludeMappingValues = excludeMappingElements.stream().map(mappingElement -> mappingElement.getAttributeValue(HWindConstants.HWIND_CONFIG_INTERCEPTOR_PATH)).collect(Collectors.toList());
+            List<String> interceptorRefNames = element.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR_REFERENCE).stream().map(mappingElement -> mappingElement.getAttributeValue(HWindConstants.HWIND_CONFIG_INTERCEPTOR_REF)).collect(Collectors.toList());
+            List<InterceptorDefine> interceptorDefines = this.parseInterceptorDefines(element.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR_DEFINE));
+            InterceptorStack.InterceptorAdapter interceptorAdapter = new InterceptorStack.InterceptorAdapter();
+            interceptorAdapter.setExcludeMapping(excludeMappingValues);
+            interceptorAdapter.setMapping(mappingValues);
+            interceptorAdapter.setInterceptorRefNames(interceptorRefNames);
+            interceptorAdapter.setInterceptorDefNames(interceptorDefines);
+            return interceptorAdapter;
+        }).collect(Collectors.toList());
+    }
+
 
     public List<HWindChannel> parseChannels(List<Element> elements) {
         if (CollectionUtils.isEmpty(elements)) {

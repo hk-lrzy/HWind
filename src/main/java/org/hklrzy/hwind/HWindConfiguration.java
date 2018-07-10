@@ -28,6 +28,8 @@ public class HWindConfiguration {
 
     private static final String DEFAULT_CONFIG_NAME = "hwind.xml";
 
+    private ElementParser elementParser;
+
     private String path;
     private List<Pack> packs;
     private List<InterceptorDefine> interceptorDefines;
@@ -36,6 +38,7 @@ public class HWindConfiguration {
 
     public HWindConfiguration(String path) throws Exception {
         this.path = path;
+        this.elementParser = ElementParser.instance();
         parseConfiguration();
     }
 
@@ -49,9 +52,8 @@ public class HWindConfiguration {
         Document document = builder.build(new File(path));
         Element root = document.getRootElement();
         if (root == null) {
-            throw new RuntimeException(String.format("HWind parse path [ %s ] with SAXBuilder failed", this.path));
+            throw new RuntimeException(String.format("hwind parse path [%s] by SAXBuilder failed", this.path));
         }
-        ElementParser elementParser = ElementParser.instance();
         this.interceptorDefines = elementParser.parseInterceptorDefines(root.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR_DEFINE));
         this.interceptorStacks = elementParser.parseInterceptorStacks(root.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR_STACK));
         this.basePackages = elementParser.parseBasePackages(root.getChildren(HWindConstants.HWINW_CONFIG_SCAN));
@@ -89,4 +91,11 @@ public class HWindConfiguration {
         return basePackages;
     }
 
+    public List<InterceptorStack> getInterceptorStacks() {
+        return interceptorStacks;
+    }
+
+    public void setInterceptorStacks(List<InterceptorStack> interceptorStacks) {
+        this.interceptorStacks = interceptorStacks;
+    }
 }

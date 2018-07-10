@@ -1,8 +1,7 @@
 package org.hklrzy.hwind.interceptor;
 
-import org.apache.commons.collections4.CollectionUtils;
+import org.hklrzy.hwind.annotation.Interceptor;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -12,43 +11,59 @@ import java.util.List;
  */
 public class InterceptorStack {
 
-    private List<String> namespaces;
 
-    private List<String> excludeNameSpaces;
+    List<InterceptorAdapter> interceptorAdapters;
 
-    private String name;
 
-    private List<String> interceptorRefNames;
+    public static class InterceptorAdapter {
+        private List<String> mapping;
 
-    public String getName() {
-        return name;
+        private List<String> excludeMapping;
+
+        private List<InterceptorDefine> interceptorDefNames;
+
+        private List<String> interceptorRefNames;
+
+        public List<String> getMapping() {
+            return mapping;
+        }
+
+        public void setMapping(List<String> mapping) {
+            this.mapping = mapping;
+        }
+
+        public List<String> getExcludeMapping() {
+            return excludeMapping;
+        }
+
+        public void setExcludeMapping(List<String> excludeMapping) {
+            this.excludeMapping = excludeMapping;
+        }
+
+
+        public List<InterceptorDefine> getInterceptorDefNames() {
+            return interceptorDefNames;
+        }
+
+        public void setInterceptorDefNames(List<InterceptorDefine> interceptorDefNames) {
+            this.interceptorDefNames = interceptorDefNames;
+        }
+
+        public List<String> getInterceptorRefNames() {
+            return interceptorRefNames;
+        }
+
+        public void setInterceptorRefNames(List<String> interceptorRefNames) {
+            this.interceptorRefNames = interceptorRefNames;
+        }
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public List<InterceptorAdapter> getInterceptorAdapters() {
+        return interceptorAdapters;
     }
 
-    public List<String> getInterceptorRefNames() {
-        return CollectionUtils.isEmpty(interceptorRefNames) ? Collections.EMPTY_LIST : interceptorRefNames;
+    public void setInterceptorAdapters(List<InterceptorAdapter> interceptorAdapters) {
+        this.interceptorAdapters = interceptorAdapters;
     }
 
-    public void setInterceptorRefNames(List<String> interceptorRefNames) {
-        this.interceptorRefNames = interceptorRefNames;
-    }
-
-    public List<String> getNamespaces() {
-        return namespaces;
-    }
-
-    public void setNamespaces(List<String> namespaces) {
-        this.namespaces = namespaces;
-    }
-
-    public List<String> getExcludeNameSpaces() {
-        return excludeNameSpaces;
-    }
-
-    public void setExcludeNameSpaces(List<String> excludeNameSpaces) {
-        this.excludeNameSpaces = excludeNameSpaces;
-    }
 }

@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
  * Created 2018/1/11.
  * Author ke.hao
  */
-public class HWindApplicationContext {
+public class HWindApplicationContext<T> {
     private static Logger logger =
             LoggerFactory.getLogger(HWindApplicationContext.class);
 
@@ -47,24 +48,24 @@ public class HWindApplicationContext {
         this.configuration = configuration;
         this.servletContext = servletContext;
         this.webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
-        initFramework();
+        initFramework(this);
     }
 
     /**
      * 初始化框架
      */
-    private void initFramework() {
+    private void initFramework(HWindApplicationContext windApplicationContext) {
 
         /*
          * 初始化一些文本信息
          */
-        initInterceptorContext();
+        initInterceptorContext(windApplicationContext);
         initChannelContext();
 
     }
 
-    private void initInterceptorContext() {
-        interceptorContext = HInterceptorContext.getInterceptorContext();
+    private void initInterceptorContext(HWindApplicationContext windApplicationContext) {
+        interceptorContext = HInterceptorContext.getInterceptorContext(windApplicationContext);
         interceptorContext.initInterceptorContext(configuration);
     }
 
@@ -112,7 +113,6 @@ public class HWindApplicationContext {
         return request.getRequestURI();
     }
 
-
     public HWindConfiguration getConfiguration() {
         return configuration;
     }
@@ -152,4 +152,6 @@ public class HWindApplicationContext {
     public void setChannelContext(HChannelContext channelContext) {
         this.channelContext = channelContext;
     }
+
+
 }
