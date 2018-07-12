@@ -1,17 +1,21 @@
 package org.hklrzy.hwind;
 
+import com.google.common.collect.Lists;
 import org.hklrzy.hwind.channel.HChannelContext;
 import org.hklrzy.hwind.interceptor.HInterceptorContext;
+import org.hklrzy.hwind.interceptor.HWindInterceptor;
 import org.hklrzy.hwind.interceptor.HWindInterceptorChain;
+import org.hklrzy.hwind.interceptor.MappedInterceptor;
+import org.hklrzy.hwind.mather.PathMather;
+import org.hklrzy.hwind.mather.SimplePathMather;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * Created 2018/1/11.
@@ -28,6 +32,7 @@ public class HWindApplicationContext<T> {
     private ServletContext servletContext;
     private WebApplicationContext webApplicationContext;
     private HChannelContext channelContext;
+    private PathMather pathMather;
 
 
     private HWindApplicationContext() {
@@ -47,6 +52,7 @@ public class HWindApplicationContext<T> {
     public void init(HWindConfiguration configuration, ServletContext servletContext) {
         this.configuration = configuration;
         this.servletContext = servletContext;
+        this.pathMather = new SimplePathMather();
         this.webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
         initFramework(this);
     }
@@ -80,14 +86,26 @@ public class HWindApplicationContext<T> {
 
         Object channel = getHandlerInternal(lookup);
 
-        getChannelInterceptorChain(channel, request);
+        return getChannelInterceptorChain(channel, request);
 
-        return null;
     }
 
     private HWindInterceptorChain getChannelInterceptorChain(Object channel, HttpServletRequest request) {
         String lookupPath = getLookUpPathForRequest(request);
-        return null;
+
+        List<HWindInterceptor> interceptors = getInterceptorContext().getInterceptors();
+
+        List<HWindInterceptor> mappingInterceptor = Lists.newArrayList();
+        interceptors.forEach(interceptor -> {
+            if (interceptor instanceof MappedInterceptor) {
+                if (pathMather.mather((MappedInterceptor) interceptor, lookupPath)) {
+                    mappingInterceptor.add(interceptor);
+                }
+            } else {
+                mappingInterceptor.add(interceptor);
+            }
+        });
+        return new HWindInterceptorChain(channel, mappingInterceptor.toArray(new MappedInterceptor[mappingInterceptor.size()]));
     }
 
     protected Object getHandlerInternal(String lookup) {

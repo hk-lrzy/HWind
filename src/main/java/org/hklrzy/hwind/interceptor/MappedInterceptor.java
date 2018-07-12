@@ -35,4 +35,12 @@ public class MappedInterceptor implements HWindInterceptor {
     public void postHandler(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
     }
+
+    public String[] getIncludePatterns() {
+        return includePatterns;
+    }
+
+    public String[] getExcludePatterns() {
+        return excludePatterns;
+    }
 }

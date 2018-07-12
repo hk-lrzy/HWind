@@ -1,7 +1,5 @@
 package org.hklrzy.hwind.interceptor;
 
-import org.hklrzy.hwind.annotation.Interceptor;
-
 import java.util.List;
 
 /**

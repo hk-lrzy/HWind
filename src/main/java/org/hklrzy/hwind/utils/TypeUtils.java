@@ -23,7 +23,7 @@ public class TypeUtils {
 
     }
 
-    public static Object[] listToArray(List<?> params) {
+    public static <T> Object[] listToArray(List<T> params) {
         Object[] array = new Object[params.size()];
         int index = 0;
         for (Object param : params) {

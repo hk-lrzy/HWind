@@ -1,10 +1,14 @@
 package org.hklrzy.hwind.servlet;
 
 import org.hklrzy.hwind.HWindApplicationContext;
+import org.hklrzy.hwind.HWindChannel;
 import org.hklrzy.hwind.HWindConfiguration;
 import org.hklrzy.hwind.HWindContext;
+import org.hklrzy.hwind.annotation.Channel;
 import org.hklrzy.hwind.channel.HChannelContext;
 import org.hklrzy.hwind.interceptor.HWindInterceptorChain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -18,6 +22,9 @@ import java.io.IOException;
  * Author ke.hao
  */
 public class HWindFrameworkServlet extends HttpServlet {
+    private static Logger logger =
+            LoggerFactory.getLogger(HWindFrameworkServlet.class);
+
     private static final String CONFIG_NAME = "config";
     private HWindApplicationContext applicationContext;
 
@@ -62,10 +69,23 @@ public class HWindFrameworkServlet extends HttpServlet {
      */
     private void doDispatch(HttpServletRequest request, HttpServletResponse response) {
 
-/*        HWindContext context = applicationContext.createContext(request, response);
-        context.invoke();
-        context.doCallBack();*/
         HWindInterceptorChain chainHandler = getHandler(request);
+
+        Exception catchException;
+        try {
+            chainHandler.applyPreInterceptor(request, response);
+
+            Object handler = chainHandler.getHandler();
+
+            HWindChannel channel = (HWindChannel) handler;
+
+            Object invoke = channel.invoke(request);
+
+            chainHandler.applyPostInterceptor(request, response);
+        } catch (Exception e) {
+            catchException = e;
+        }
+
 
     }
 
@@ -76,8 +96,7 @@ public class HWindFrameworkServlet extends HttpServlet {
      * @return
      */
     private HWindInterceptorChain getHandler(HttpServletRequest request) {
-        applicationContext.getHandler(request);
-        return null;
+        return applicationContext.getHandler(request);
     }
 
     @Override

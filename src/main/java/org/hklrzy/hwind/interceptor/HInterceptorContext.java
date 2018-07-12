@@ -2,16 +2,15 @@ package org.hklrzy.hwind.interceptor;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hklrzy.hwind.HWindApplicationContext;
 import org.hklrzy.hwind.HWindConfiguration;
-import org.hklrzy.hwind.Pack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.WebApplicationContext;
 
+import javax.crypto.MacSpi;
 import java.util.List;
 import java.util.Map;
 
@@ -29,8 +28,9 @@ public class HInterceptorContext {
     private HWindApplicationContext windApplicationContext;
     private InterceptorFactory interceptorFactory;
 
-    private Map<String, HWindInterceptor> nameAndInterceptorMap = Maps.newConcurrentMap();
-    private Map<String, Map<String, HWindInterceptor>> interceptors = Maps.newHashMap();
+    private Map<String, String> nameAndClassNameMap = Maps.newConcurrentMap();
+    private Map<String, HWindInterceptor> interceptorMap = Maps.newHashMap();
+    private List<HWindInterceptor> interceptors = Lists.newArrayList();
 
 
     private HInterceptorContext(HWindApplicationContext windApplicationContext) {
@@ -48,7 +48,7 @@ public class HInterceptorContext {
     public void initInterceptorContext(HWindConfiguration configuration) {
         Preconditions.checkNotNull(configuration, "hwind configuration can't be null");
 
-        initInterceptors(configuration);
+        registerInterceptorName(configuration);
         initInterceptorStack(configuration);
     }
 
@@ -58,8 +58,8 @@ public class HInterceptorContext {
      *
      * @param configuration 拦截器的配置信息
      */
-    private void initInterceptors(HWindConfiguration configuration) {
-        initInterceptors(configuration.getInterceptorDefines());
+    private void registerInterceptorName(HWindConfiguration configuration) {
+        registerInterceptorName(configuration.getInterceptorDefines());
     }
 
 
@@ -69,20 +69,42 @@ public class HInterceptorContext {
      *
      * @param interceptors
      */
-    private void initInterceptors(List<InterceptorDefine> interceptors) {
+    private void registerInterceptorName(List<InterceptorDefine> interceptors) {
         if (CollectionUtils.isEmpty(interceptors)) {
             logger.debug("HWind has no interceptors");
             return;
         }
-
         for (InterceptorDefine interceptorDefine : interceptors) {
-            HWindInterceptor interceptor = interceptorFactory.getInterceptor(interceptorDefine);
-            nameAndInterceptorMap.put(interceptorDefine.getName(), interceptor);
+            nameAndClassNameMap.put(interceptorDefine.getName(), interceptorDefine.getClassName());
         }
     }
 
     private void initInterceptorStack(HWindConfiguration configuration) {
+        List<InterceptorStack> interceptorStacks = configuration.getInterceptorStacks();
+        interceptorStacks.forEach(interceptorStack -> {
+            List<InterceptorStack.InterceptorAdapter> interceptorAdapters = interceptorStack.getInterceptorAdapters();
+            interceptors = initInterceptors(interceptorAdapters);
+        });
+    }
 
+    private List<HWindInterceptor> initInterceptors(List<InterceptorStack.InterceptorAdapter> interceptorAdapters) {
+        List<HWindInterceptor> interceptors = Lists.newArrayList();
+        for (InterceptorStack.InterceptorAdapter interceptorAdapter : interceptorAdapters) {
+            List<String> interceptorRefNames = interceptorAdapter.getInterceptorRefNames();
+            for (String interceptorName : interceptorRefNames) {
+                if (!nameAndClassNameMap.containsKey(interceptorName)) {
+                    throw new RuntimeException(String.format("The interceptor which name is [%s] not exists", interceptorName));
+                }
+                String className = nameAndClassNameMap.get(interceptorName);
+                HWindInterceptor interceptor = interceptorFactory.getInterceptor(className, HWindInterceptor.class);
+                List<String> mapping = interceptorAdapter.getMapping();
+                List<String> excludeMapping = interceptorAdapter.getExcludeMapping();
+                MappedInterceptor mappedInterceptor = new MappedInterceptor(mapping.toArray(new String[mapping.size()]), excludeMapping.toArray(new String[excludeMapping.size()]), interceptor);
+                interceptors.add(mappedInterceptor);
+                interceptorMap.put(interceptorName, mappedInterceptor);
+            }
+        }
+        return interceptors;
     }
 
     public HWindInterceptor getHWindInterceptor(String namespace, String name) {
@@ -90,9 +112,10 @@ public class HInterceptorContext {
             logger.error("HWind interceptor's name or namespace can't be null or empty");
             throw new IllegalArgumentException(String.format("illegal argument to get HWind interceptor with name [ %s ] and [ %s ]", name, namespace));
         }
-        return interceptors.get(namespace).get(name);
-
+        return interceptorMap.get(name);
     }
 
-
+    public List<HWindInterceptor> getInterceptors() {
+        return interceptors;
+    }
 }

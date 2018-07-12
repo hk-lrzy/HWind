@@ -19,16 +19,17 @@ public class InterceptorFactory {
         return interceptorFactory;
     }
 
-    public HWindInterceptor getInterceptor(InterceptorDefine interceptorDefine) {
-        HWindInterceptor interceptor = null;
+    @SuppressWarnings("unchecked")
+    public <T> T getInterceptor(String className, Class<T> requiredType) {
+        T bean = null;
         try {
-            Class<?> clazz = Class.forName(interceptorDefine.getClassName());
-            if (HWindInterceptor.class.isAssignableFrom(clazz)) {
-                interceptor = (HWindInterceptor) clazz.newInstance();
+            Class<?> clazz = Class.forName(className);
+            if (requiredType.isAssignableFrom(clazz)) {
+                bean = (T) clazz.newInstance();
             }
         } catch (Exception e) {
-            logger.error("interceptor class [ {} ] get instance failed", interceptorDefine.getClassName());
+            logger.error("instance class with name [{}] and type [{}] failed", className, requiredType);
         }
-        return interceptor;
+        return bean;
     }
 }

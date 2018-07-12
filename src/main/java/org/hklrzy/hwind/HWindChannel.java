@@ -8,6 +8,7 @@ import org.hklrzy.hwind.utils.TypeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -42,16 +43,16 @@ public class HWindChannel {
     private Pack pack;
 
     @SuppressWarnings("all")
-    public Object invoke(HWindContext context) {
+    public Object invoke(HttpServletRequest request) {
         try {
             Class<?> handlerClass = channelHandler == null ? Class.forName(className) : channelHandler.getClass();
             channelHandler = channelHandler == null ? handlerClass.newInstance() : channelHandler;
 
-            Map<String, String[]> parameterMap = context.getRequest().getParameterMap();
+            Map<String, String[]> parameterMap = request.getParameterMap();
 
             Method method = handlerClass.getMethod(methodName, (Class<?>[]) TypeUtils.listToArray(parameterTypes));
 
-            return method.invoke(channelHandler, getParameterArray(method, context.getRequest().getParameterMap()));
+            return method.invoke(channelHandler, getParameterArray(method, request.getParameterMap()));
 
         } catch (Exception e) {
             logger.error("HWind invoke channel [ {} ] and class name [ {} ] failed", name, className);
