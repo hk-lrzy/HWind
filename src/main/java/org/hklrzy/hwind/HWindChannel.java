@@ -3,6 +3,7 @@ package org.hklrzy.hwind;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hklrzy.hwind.constants.HWindConstants;
 import org.hklrzy.hwind.utils.TypeUtils;
 import org.slf4j.Logger;
@@ -24,15 +25,17 @@ public class HWindChannel {
     private static Logger logger =
             LoggerFactory.getLogger(HWindChannel.class);
 
+    private String namespace;
+
     private String name;
 
     private String className;
 
     private String methodName;
 
-    private List<String> parameterNames;
+    private String[] parameterNames;
 
-    private List<Class<?>> parameterTypes;
+    private Class<?>[] parameterTypes;
 
     private List<String> interceptorRefNames;
 
@@ -50,12 +53,14 @@ public class HWindChannel {
 
             Map<String, String[]> parameterMap = request.getParameterMap();
 
-            Method method = handlerClass.getMethod(methodName, (Class<?>[]) TypeUtils.listToArray(parameterTypes));
+            Method method = handlerClass.getMethod(methodName, parameterTypes);
 
-            return method.invoke(channelHandler, getParameterArray(method, request.getParameterMap()));
+            List<Object> parameterList = getParameterArray(method, request.getParameterMap());
+
+            return method.invoke(channelHandler,TypeUtils.listToArray(parameterList) );
 
         } catch (Exception e) {
-            logger.error("HWind invoke channel [ {} ] and class name [ {} ] failed", name, className);
+            logger.error("HWind invoke channel [{}] and class name [{}] failed", name, className, e);
             throw new RuntimeException(e.getMessage());
         }
     }
@@ -107,7 +112,10 @@ public class HWindChannel {
         if (!pack.getNamespace().endsWith("/")) {
             stringBuilder.append("/");
         }
-        return stringBuilder.append(name).toString();
+        if (StringUtils.isNotEmpty(namespace) && !("/".equals(namespace))) {
+            stringBuilder.append(namespace);
+        }
+        return stringBuilder.toString();
     }
 
     private String getTypeName(Class<?> fieldType, String fieldName) {
@@ -174,19 +182,19 @@ public class HWindChannel {
         this.requireParams = requireParams;
     }
 
-    public List<String> getParameterNames() {
+    public String[] getParameterNames() {
         return parameterNames;
     }
 
-    public void setParameterNames(List<String> parameterNames) {
+    public void setParameterNames(String[] parameterNames) {
         this.parameterNames = parameterNames;
     }
 
-    public List<Class<?>> getParameterTypes() {
+    public Class<?>[] getParameterTypes() {
         return parameterTypes;
     }
 
-    public void setParameterTypes(List<Class<?>> parameterTypes) {
+    public void setParameterTypes(Class<?>[] parameterTypes) {
         this.parameterTypes = parameterTypes;
     }
 
@@ -196,5 +204,13 @@ public class HWindChannel {
 
     public void setChannelHandler(Object channelHandler) {
         this.channelHandler = channelHandler;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 }

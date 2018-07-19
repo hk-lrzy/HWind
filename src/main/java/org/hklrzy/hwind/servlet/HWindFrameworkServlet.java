@@ -1,11 +1,9 @@
 package org.hklrzy.hwind.servlet;
 
+import com.alibaba.fastjson.JSONObject;
 import org.hklrzy.hwind.HWindApplicationContext;
 import org.hklrzy.hwind.HWindChannel;
 import org.hklrzy.hwind.HWindConfiguration;
-import org.hklrzy.hwind.HWindContext;
-import org.hklrzy.hwind.annotation.Channel;
-import org.hklrzy.hwind.channel.HChannelContext;
 import org.hklrzy.hwind.interceptor.HWindInterceptorChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * Created 2018/6/11.
@@ -27,6 +26,8 @@ public class HWindFrameworkServlet extends HttpServlet {
 
     private static final String CONFIG_NAME = "config";
     private HWindApplicationContext applicationContext;
+    private static final String CONTENT_TYPE = "content-type";
+    private static final String JSON_APPLICATION = "application/json";
 
 
     @Override
@@ -71,7 +72,8 @@ public class HWindFrameworkServlet extends HttpServlet {
 
         HWindInterceptorChain chainHandler = getHandler(request);
 
-        Exception catchException;
+        Exception catchException = null;
+        Object mv = null;
         try {
             chainHandler.applyPreInterceptor(request, response);
 
@@ -79,14 +81,33 @@ public class HWindFrameworkServlet extends HttpServlet {
 
             HWindChannel channel = (HWindChannel) handler;
 
-            Object invoke = channel.invoke(request);
+            mv = channel.invoke(request);
 
             chainHandler.applyPostInterceptor(request, response);
         } catch (Exception e) {
+            logger.error("dispatcher handler failed");
             catchException = e;
         }
+        processResponseWithException(request, response, mv, catchException);
 
 
+    }
+
+    private void processResponseWithException(HttpServletRequest request, HttpServletResponse response, Object mv, Exception catchException) {
+        try {
+            PrintWriter writer = response.getWriter();
+            response.setHeader(CONTENT_TYPE, JSON_APPLICATION);
+            if (catchException == null && mv != null) {
+                response.setStatus(200);
+                writer.print(JSONObject.toJSONString(mv));
+                writer.flush();
+            } else if (catchException != null) {
+                writer.print(catchException.getMessage());
+                response.setStatus(500);
+            }
+        } catch (Exception e) {
+
+        }
     }
 
     /**

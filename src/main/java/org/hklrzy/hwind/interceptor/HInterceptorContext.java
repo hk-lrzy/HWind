@@ -10,7 +10,6 @@ import org.hklrzy.hwind.HWindConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.MacSpi;
 import java.util.List;
 import java.util.Map;
 
@@ -81,10 +80,12 @@ public class HInterceptorContext {
 
     private void initInterceptorStack(HWindConfiguration configuration) {
         List<InterceptorStack> interceptorStacks = configuration.getInterceptorStacks();
-        interceptorStacks.forEach(interceptorStack -> {
-            List<InterceptorStack.InterceptorAdapter> interceptorAdapters = interceptorStack.getInterceptorAdapters();
-            interceptors = initInterceptors(interceptorAdapters);
-        });
+        if (interceptorStacks != null) {
+            interceptorStacks.forEach(interceptorStack -> {
+                List<InterceptorStack.InterceptorAdapter> interceptorAdapters = interceptorStack.getInterceptorAdapters();
+                interceptors = initInterceptors(interceptorAdapters);
+            });
+        }
     }
 
     private List<HWindInterceptor> initInterceptors(List<InterceptorStack.InterceptorAdapter> interceptorAdapters) {

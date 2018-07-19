@@ -1,119 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:beans="http://www.springframework.org/schema/beans">
 
-    <!--拦截器定义-->
-    <xs:element name="interceptor-def">
-        <xs:complexType>
-            <xs:attribute name="name" type="xs:string" use="required"/>
-            <xs:attribute name="class" type="xs:string" use="required"/>
-        </xs:complexType>
-    </xs:element>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"/>
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <!--拦截器部分定义-->
+    <xsd:element name="interceptor-def">
+        <xsd:complexType>
+            <xsd:attribute name="name" type="xsd:string" use="required"/>
+            <xsd:attribute name="class" type="xsd:string" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
 
-    <xs:element name="hwind-scan">
-        <xs:complexType>
-            <xs:attribute name="name" type="xs:string" use="required"/>
-        </xs:complexType>
-    </xs:element>
+    <xsd:element name="interceptor-ref">
+        <xsd:complexType>
+            <xsd:attribute name="ref" type="xsd:attribute" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
 
-    <!--拦截器栈-->
-    <xs:element name="interceptor-stack">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="interceptor"/>
-            </xs:sequence>
-            <xs:attribute name="name" type="xs:string" use="required"/>
-        </xs:complexType>
-    </xs:element>
+    <xsd:element name="interceptor-stack">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="interceptor" maxOccurs="unbounded" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="mapping" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:attribute name="path" type="xsd:string" use="required"/>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:element name="exclude-mapping" minOccurs="0" maxOccurs="unbounded">
+                                <xsd:complexType>
+                                    <xsd:attribute name="path" type="xsd:string" use="required"/>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:choice maxOccurs="unbounded">
+                                <xsd:element ref="interceptor-def"/>
+                                <xsd:element ref="interceptor-ref"/>
+                            </xsd:choice>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <!--拦截器结束-->
 
-    <!-- 声明拦截器 -->
-    <xs:element name="interceptor">
-        <xs:complexType>
-            <xs:attribute name="name" type="xs:string" use="required"/>
-        </xs:complexType>
-    </xs:element>
+    <!--pack开始-->
+    <xsd:element name="pack">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="channel" maxOccurs="unbounded">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="param" form="unqualified" maxOccurs="unbounded" minOccurs="0">
+                                <xsd:complexType>
+                                    <xsd:attribute name="name" use="required" type="xsd:string"/>
+                                    <xsd:attribute name="type" use="required" type="xsd:string"/>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                        <xsd:attribute name="namespace" type="xsd:string" use="required"/>
+                        <xsd:attribute name="name" type="xsd:string"/>
+                        <xsd:attribute name="class" type="xsd:string" use="required"/>
+                        <xsd:attribute name="method" type="xsd:string" use="required"/>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+            <xsd:attribute name="namespace" type="xsd:string" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+    <!--pack结束-->
 
-    <!-- require -->
-    <xs:element name="require">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="param">
-                    <xs:complexType>
-                        <xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
-                    </xs:complexType>
-                </xs:element>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+    <!--config定义-->
+    <xsd:element name="hwinds">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="interceptor-def" minOccurs="0" maxOccurs="unbounded"/>
+                <xsd:element ref="interceptor-stack" minOccurs="0" maxOccurs="unbounded"/>
+                <xsd:element ref="pack" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
 
-
-    <!--参数声明-->
-    <xs:element name="param">
-        <xs:complexType>
-            <xs:attribute name="name" type="xs:string" use="required"/>
-            <xs:attribute name="class" type="xs:string" use="required"/>
-        </xs:complexType>
-    </xs:element>
-
-    <!-- channel -->
-    <xs:element name="channel">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="interceptor"></xs:element>
-                <xs:element ref="require" maxOccurs="1"></xs:element>
-                <xs:element ref="param"/>
-            </xs:sequence>
-            <xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
-            <xs:attribute name="class" type="xs:string" use="required"></xs:attribute>
-            <xs:attribute name="method" type="xs:string" use="required"></xs:attribute>
-        </xs:complexType>
-    </xs:element>
-
-    <!-- pack -->
-    <xs:element name="pack">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="interceptor-def"></xs:element>
-                <xs:element ref="interceptor-stack"></xs:element>
-                <xs:element ref="interceptor"></xs:element>
-
-                <xs:element name="default-class" maxOccurs="1">
-                    <xs:complexType>
-                        <xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
-                    </xs:complexType>
-                </xs:element>
-
-                <xs:element ref="channel"></xs:element>
-            </xs:sequence>
-
-            <xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
-            <xs:attribute name="namespace" type="xs:string" use="required"></xs:attribute>
-        </xs:complexType>
-    </xs:element>
-
-    <!-- Start -->
-    <xs:element name="config">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="constant">
-                    <xs:complexType>
-                        <xs:attribute name="name" use="required"></xs:attribute>
-                        <xs:attribute name="value" use="required"></xs:attribute>
-                    </xs:complexType>
-                </xs:element>
-
-                <xs:element ref="interceptor-def"></xs:element>
-                <xs:element ref="interceptor-stack"></xs:element>
-                <xs:element ref="interceptor"></xs:element>
-
-                <xs:element ref="pack"></xs:element>
-
-                <xs:element name="include">
-                    <xs:complexType>
-                        <xs:attribute name="src" type="xs:string" use="required"></xs:attribute>
-                    </xs:complexType>
-                </xs:element>
-            </xs:sequence>
-        </xs:complexType>
-
-    </xs:element>
-</xs:schema>
+</xsd:schema>

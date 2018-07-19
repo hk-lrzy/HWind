@@ -1,6 +1,7 @@
 package org.hklrzy.hwind.utils;
 
 import com.google.common.primitives.Primitives;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +25,9 @@ public class TypeUtils {
     }
 
     public static <T> Object[] listToArray(List<T> params) {
+        if (CollectionUtils.isEmpty(params)) {
+            return new Object[0];
+        }
         Object[] array = new Object[params.size()];
         int index = 0;
         for (Object param : params) {

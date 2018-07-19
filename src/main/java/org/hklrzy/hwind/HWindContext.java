@@ -29,16 +29,6 @@ public class HWindContext {
     }
 
 
-    public void invoke() {
-
-        this.channel.invoke(this);
-    }
-
-    public void doCallBack() {
-
-    }
-
-
     public HttpServletRequest getRequest() {
         return request;
     }

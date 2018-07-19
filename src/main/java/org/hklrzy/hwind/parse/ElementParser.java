@@ -1,5 +1,6 @@
 package org.hklrzy.hwind.parse;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hklrzy.hwind.HWindChannel;
@@ -105,6 +106,7 @@ public class ElementParser {
         }
         return elements.stream().map(element -> {
             HWindChannel channel = new HWindChannel();
+            channel.setNamespace(element.getAttributeValue(HWindConstants.HWIND_CONFIG_NAME_SPACE));
             channel.setName(element.getAttributeValue(HWindConstants.HWIND_CONFIG_NAME));
             channel.setMethodName(element.getAttributeValue(HWindConstants.HWIND_CONFIG_METHOD));
             channel.setClassName(element.getAttributeValue(HWindConstants.HWIND_CONFIG_CLASS));
@@ -117,14 +119,20 @@ public class ElementParser {
     public void parseParams(List<Element> elements, HWindChannel channel) {
         if (CollectionUtils.isNotEmpty(elements)) {
 
-            List<String> paramNames = Lists.newArrayList();
-            List<Class<?>> paramTypes = Lists.newArrayList();
+            String[] paramNames = new String[elements.size()];
+            Class<?>[] paramTypes = new Class[elements.size()];
+            int paramIndex = 0;
             for (Element element : elements) {
                 String name = element.getAttributeValue(HWindConstants.HWIND_CONFIG_NAME);
-                paramNames.add(name);
                 String className = element.getAttributeValue(HWindConstants.HWIND_CONFIG_CLASS);
+                if (Strings.isNullOrEmpty(name) || Strings.isNullOrEmpty(className)) {
+                    logger.error("channel param's name and channel params' class name can't be null", channel.getClassName());
+                    throw new RuntimeException("channel参数中存在空值，请检查配置配置文件");
+                }
                 try {
-                    paramTypes.add(Class.forName(className));
+                    paramNames[paramIndex] = name;
+                    paramTypes[paramIndex] = (Class.forName(className));
+                    paramIndex++;
                 } catch (Exception e) {
                     logger.error("class [ {} ] not found, please check channel's [ {} ] config", className, channel.getName(), e);
                     throw new RuntimeException(e.getMessage());
