@@ -57,7 +57,7 @@ public class HWindChannel {
 
             List<Object> parameterList = getParameterArray(method, request.getParameterMap());
 
-            return method.invoke(channelHandler,TypeUtils.listToArray(parameterList) );
+            return method.invoke(channelHandler, TypeUtils.listToArray(parameterList));
 
         } catch (Exception e) {
             logger.error("HWind invoke channel [{}] and class name [{}] failed", name, className, e);
@@ -108,13 +108,20 @@ public class HWindChannel {
     }
 
     public String getCanonicalName() {
-        StringBuilder stringBuilder = new StringBuilder(pack.getNamespace());
-        if (!pack.getNamespace().endsWith("/")) {
+        StringBuilder stringBuilder = new StringBuilder();
+        String packNamespace = pack.getNamespace();
+
+        if (StringUtils.isNotEmpty(packNamespace) && !("/".equals(packNamespace))) {
+            stringBuilder.append(packNamespace);
+        }
+
+        if (Strings.isNullOrEmpty(namespace)) {
+            throw new IllegalArgumentException(String.format("channel with class name [%s] namespace is empty", this.className));
+        }
+        if ('/' != (namespace.charAt(0))) {
             stringBuilder.append("/");
         }
-        if (StringUtils.isNotEmpty(namespace) && !("/".equals(namespace))) {
-            stringBuilder.append(namespace);
-        }
+        stringBuilder.append(this.namespace);
         return stringBuilder.toString();
     }
 
