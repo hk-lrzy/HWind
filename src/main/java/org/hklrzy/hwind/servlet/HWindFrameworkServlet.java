@@ -1,10 +1,13 @@
 package org.hklrzy.hwind.servlet;
 
-import com.alibaba.fastjson.JSONObject;
 import org.hklrzy.hwind.HWindApplicationContext;
-import org.hklrzy.hwind.HWindChannel;
 import org.hklrzy.hwind.HWindConfiguration;
+import org.hklrzy.hwind.HWindHandlerAdapter;
+import org.hklrzy.hwind.HWindModelAndView;
+import org.hklrzy.hwind.handler.RequestMappingHandlerAdapter;
 import org.hklrzy.hwind.interceptor.HWindInterceptorChain;
+import org.hklrzy.hwind.method.annotation.ResponseBodyReturnValueHandler;
+import org.hklrzy.hwind.method.support.HWindHandlerExceptionResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +17,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.List;
 
 /**
  * Created 2018/6/11.
@@ -26,11 +29,13 @@ public class HWindFrameworkServlet extends HttpServlet {
 
     private static final String CONFIG_NAME = "config";
     private HWindApplicationContext applicationContext;
-    private static final String CONTENT_TYPE = "content-type";
-    private static final String JSON_APPLICATION = "application/json";
+
+    private HWindHandlerAdapter handlerAdapter;
+    private List<HWindHandlerExceptionResolver> handlerExceptionResolvers;
 
 
     @Override
+
     public void init(ServletConfig config) throws ServletException {
         String configFilePath = config.getInitParameter(CONFIG_NAME);
 
@@ -45,6 +50,8 @@ public class HWindFrameworkServlet extends HttpServlet {
          */
         applicationContext = HWindApplicationContext.getApplicationContext();
         applicationContext.init(hWindConfiguration, config.getServletContext());
+        handlerAdapter = new RequestMappingHandlerAdapter(new ResponseBodyReturnValueHandler());
+
     }
 
     @Override
@@ -73,40 +80,37 @@ public class HWindFrameworkServlet extends HttpServlet {
         HWindInterceptorChain chainHandler = getHandler(request);
 
         Exception catchException = null;
-        Object mv = null;
+        HWindModelAndView mv = null;
         try {
             //todo 404
+            if (chainHandler == null || chainHandler.getHandler() == null) {
+                noHandlerFound(request, response);
+                return;
+            }
             chainHandler.applyPreInterceptor(request, response);
 
             Object handler = chainHandler.getHandler();
 
-            HWindChannel channel = (HWindChannel) handler;
+            HWindHandlerAdapter handlerAdapter = getHandlerAdapter(handler);
 
-            mv = channel.invoke(request);
+            mv = handlerAdapter.handle(request, response, handler);
 
             chainHandler.applyPostInterceptor(request, response);
         } catch (Exception e) {
-            logger.error("dispatcher handler failed");
+            logger.error("do dispatch failed");
             catchException = e;
         }
         processResponseWithException(request, response, mv, catchException);
+    }
 
-
+    private void noHandlerFound(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        response.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
 
     private void processResponseWithException(HttpServletRequest request, HttpServletResponse response, Object mv, Exception catchException) {
-        try {
-            PrintWriter writer = response.getWriter();
-            response.setHeader(CONTENT_TYPE, JSON_APPLICATION);
-            if (catchException == null && mv != null) {
-                response.setStatus(200);
-                writer.print(JSONObject.toJSONString(mv));
-                writer.flush();
-            } else if (catchException != null) {
-                writer.print(catchException.getMessage());
-                response.setStatus(500);
-            }
-        } catch (Exception e) {
+        if (catchException == null) {
+            //render(request, response, mv);
+        } else {
 
         }
     }
@@ -121,8 +125,20 @@ public class HWindFrameworkServlet extends HttpServlet {
         return applicationContext.getHandler(request);
     }
 
+    public HWindHandlerAdapter getHandlerAdapter(Object handler) {
+        return handlerAdapter;
+    }
+
     @Override
     public void destroy() {
 
+    }
+
+    public List<HWindHandlerExceptionResolver> getHandlerExceptionResolvers() {
+        return handlerExceptionResolvers;
+    }
+
+    public void setHandlerExceptionResolvers(List<HWindHandlerExceptionResolver> handlerExceptionResolvers) {
+        this.handlerExceptionResolvers = handlerExceptionResolvers;
     }
 }

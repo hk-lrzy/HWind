@@ -5,11 +5,13 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hklrzy.hwind.constants.HWindConstants;
+import org.hklrzy.hwind.utils.RefectionUtils;
 import org.hklrzy.hwind.utils.TypeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -43,21 +45,25 @@ public class HWindChannel {
 
     private Object channelHandler;
 
+    private Class<?> channelClass;
+
+    private Method method;
+
     private Pack pack;
 
     @SuppressWarnings("all")
-    public Object invoke(HttpServletRequest request) {
+    public Object invoke(HttpServletRequest request, HttpServletResponse response) {
         try {
-            Class<?> handlerClass = channelHandler == null ? Class.forName(className) : channelHandler.getClass();
-            channelHandler = channelHandler == null ? handlerClass.newInstance() : channelHandler;
+
+            if (channelHandler == null) {
+                channelHandler = channelHandler == null ? getChannelClass().newInstance() : channelHandler;
+            }
 
             Map<String, String[]> parameterMap = request.getParameterMap();
 
-            Method method = handlerClass.getMethod(methodName, parameterTypes);
+            List<Object> parameterList = getParameterArray(getMethod(), request.getParameterMap());
 
-            List<Object> parameterList = getParameterArray(method, request.getParameterMap());
-
-            return method.invoke(channelHandler, TypeUtils.listToArray(parameterList));
+            return getMethod().invoke(channelHandler, TypeUtils.listToArray(parameterList));
 
         } catch (Exception e) {
             logger.error("HWind invoke channel [{}] and class name [{}] failed", name, className, e);
@@ -140,6 +146,16 @@ public class HWindChannel {
 
     }
 
+    public Class<?> getChannelClass() {
+        if (channelClass == null) {
+            channelClass = RefectionUtils.getBeanClass(className);
+        }
+        return channelClass;
+    }
+
+    public void setChannelClass(Class<?> channelClass) {
+        this.channelClass = channelClass;
+    }
 
     public String getName() {
         return name;
@@ -219,5 +235,16 @@ public class HWindChannel {
 
     public void setNamespace(String namespace) {
         this.namespace = namespace;
+    }
+
+    public Method getMethod() {
+        if (method == null) {
+            method = RefectionUtils.getClassMethod(getChannelClass(), methodName, parameterTypes);
+        }
+        return method;
+    }
+
+    public void setMethod(Method method) {
+        this.method = method;
     }
 }

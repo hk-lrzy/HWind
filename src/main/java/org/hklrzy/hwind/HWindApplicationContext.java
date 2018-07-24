@@ -54,6 +54,7 @@ public class HWindApplicationContext<T> {
         this.servletContext = servletContext;
         this.pathMather = new SimplePathMather();
         this.webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+
         initFramework(this);
     }
 
