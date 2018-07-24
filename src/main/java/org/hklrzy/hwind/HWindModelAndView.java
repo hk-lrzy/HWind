@@ -67,4 +67,12 @@ public class HWindModelAndView {
         getModelMap().addAttribute(attributeName, attributeValue);
         return this;
     }
+
+    public boolean isCleared() {
+        return this.cleared;
+    }
+
+    public void setCleared(boolean cleared) {
+        this.cleared = cleared;
+    }
 }

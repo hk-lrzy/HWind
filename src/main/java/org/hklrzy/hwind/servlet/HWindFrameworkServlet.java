@@ -1,5 +1,6 @@
 package org.hklrzy.hwind.servlet;
 
+import com.alibaba.fastjson.JSONObject;
 import org.hklrzy.hwind.HWindApplicationContext;
 import org.hklrzy.hwind.HWindConfiguration;
 import org.hklrzy.hwind.HWindHandlerAdapter;
@@ -8,8 +9,11 @@ import org.hklrzy.hwind.handler.RequestMappingHandlerAdapter;
 import org.hklrzy.hwind.interceptor.HWindInterceptorChain;
 import org.hklrzy.hwind.method.annotation.ResponseBodyReturnValueHandler;
 import org.hklrzy.hwind.method.support.HWindHandlerExceptionResolver;
+import org.hklrzy.hwind.view.JSTLViewResolver;
+import org.hklrzy.hwind.view.ViewResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -32,6 +36,7 @@ public class HWindFrameworkServlet extends HttpServlet {
 
     private HWindHandlerAdapter handlerAdapter;
     private List<HWindHandlerExceptionResolver> handlerExceptionResolvers;
+    private ViewResolver viewResolver;
 
 
     @Override
@@ -51,6 +56,7 @@ public class HWindFrameworkServlet extends HttpServlet {
         applicationContext = HWindApplicationContext.getApplicationContext();
         applicationContext.init(hWindConfiguration, config.getServletContext());
         handlerAdapter = new RequestMappingHandlerAdapter(new ResponseBodyReturnValueHandler());
+        viewResolver = new JSTLViewResolver();
 
     }
 
@@ -104,15 +110,35 @@ public class HWindFrameworkServlet extends HttpServlet {
     }
 
     private void noHandlerFound(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        response.sendError(HttpStatus.NOT_FOUND.value());
     }
 
-    private void processResponseWithException(HttpServletRequest request, HttpServletResponse response, Object mv, Exception catchException) {
-        if (catchException == null) {
-            //render(request, response, mv);
+
+    /**
+     * todo 怎么处理view
+     *
+     *
+     * @param request
+     * @param response
+     * @param mv
+     * @param catchException
+     */
+    private void processResponseWithException(HttpServletRequest request, HttpServletResponse response, HWindModelAndView mv, Exception catchException) {
+        if (catchException != null) {
+            if (!mv.isCleared()) {
+                try {
+                    render(request, response, mv);
+                } catch (Exception e) {
+                    logger.error("failed render view with mv [{}]", JSONObject.toJSONString(mv));
+                }
+            }
         } else {
 
         }
+    }
+
+    private void render(HttpServletRequest request, HttpServletResponse response, HWindModelAndView mv) throws Exception {
+        viewResolver.resolver(request, response, mv);
     }
 
     /**

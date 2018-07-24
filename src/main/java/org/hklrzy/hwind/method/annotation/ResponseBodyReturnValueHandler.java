@@ -27,6 +27,7 @@ public class ResponseBodyReturnValueHandler implements HWindReturnValueHandler {
 
     @Override
     public void handleReturnValue(Object returnValue, HWindChannel channel, HWindModelAndView modelAndView, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        modelAndView.setCleared(true);
         PrintWriter writer = response.getWriter();
         response.setHeader(CONTENT_TYPE, JSON_APPLICATION);
         response.setStatus(HttpStatus.OK.value());
