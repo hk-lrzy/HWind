@@ -48,7 +48,7 @@ public class HInterceptorContext {
         Preconditions.checkNotNull(configuration, "hwind configuration can't be null");
 
         registerInterceptorName(configuration);
-        initInterceptorStack(configuration);
+        initInterceptorStack(configuration.getInterceptorStacks());
     }
 
 
@@ -78,8 +78,7 @@ public class HInterceptorContext {
         }
     }
 
-    private void initInterceptorStack(HWindConfiguration configuration) {
-        List<InterceptorStack> interceptorStacks = configuration.getInterceptorStacks();
+    private void initInterceptorStack(List<InterceptorStack> interceptorStacks) {
         if (interceptorStacks != null) {
             interceptorStacks.forEach(interceptorStack -> {
                 List<InterceptorStack.InterceptorAdapter> interceptorAdapters = interceptorStack.getInterceptorAdapters();
@@ -91,19 +90,13 @@ public class HInterceptorContext {
     private List<HWindInterceptor> initInterceptors(List<InterceptorStack.InterceptorAdapter> interceptorAdapters) {
         List<HWindInterceptor> interceptors = Lists.newArrayList();
         for (InterceptorStack.InterceptorAdapter interceptorAdapter : interceptorAdapters) {
-            List<String> interceptorRefNames = interceptorAdapter.getInterceptorRefNames();
-            for (String interceptorName : interceptorRefNames) {
-                if (!nameAndClassNameMap.containsKey(interceptorName)) {
-                    throw new RuntimeException(String.format("The interceptor which name is [%s] not exists", interceptorName));
-                }
-                String className = nameAndClassNameMap.get(interceptorName);
-                HWindInterceptor interceptor = interceptorFactory.getInterceptor(className, HWindInterceptor.class);
-                List<String> mapping = interceptorAdapter.getMapping();
-                List<String> excludeMapping = interceptorAdapter.getExcludeMapping();
-                MappedInterceptor mappedInterceptor = new MappedInterceptor(mapping.toArray(new String[mapping.size()]), excludeMapping.toArray(new String[excludeMapping.size()]), interceptor);
-                interceptors.add(mappedInterceptor);
-                interceptorMap.put(interceptorName, mappedInterceptor);
-            }
+            InterceptorDefine interceptorDefine = interceptorAdapter.getInterceptorDefine();
+            HWindInterceptor interceptor = interceptorFactory.getInterceptor(interceptorDefine.getClassName(), HWindInterceptor.class);
+            List<String> mapping = interceptorAdapter.getMapping();
+            List<String> excludeMapping = interceptorAdapter.getExcludeMapping();
+            MappedInterceptor mappedInterceptor = new MappedInterceptor(mapping.toArray(new String[mapping.size()]), excludeMapping.toArray(new String[excludeMapping.size()]), interceptor);
+            interceptors.add(mappedInterceptor);
+            interceptorMap.put(interceptorDefine.getName(), mappedInterceptor);
         }
         return interceptors;
     }

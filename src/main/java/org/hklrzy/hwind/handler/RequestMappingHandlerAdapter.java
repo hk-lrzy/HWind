@@ -1,7 +1,7 @@
 package org.hklrzy.hwind.handler;
 
 import com.google.common.collect.Lists;
-import org.hklrzy.hwind.HWindChannel;
+import org.hklrzy.hwind.channel.HWindChannel;
 import org.hklrzy.hwind.HWindHandlerAdapter;
 import org.hklrzy.hwind.HWindModelAndView;
 import org.hklrzy.hwind.method.support.HWindReturnValueHandler;

@@ -1,6 +1,6 @@
 package org.hklrzy.hwind.method.support;
 
-import org.hklrzy.hwind.HWindChannel;
+import org.hklrzy.hwind.channel.HWindChannel;
 import org.hklrzy.hwind.HWindModelAndView;
 
 import javax.servlet.http.HttpServletRequest;

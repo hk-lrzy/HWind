@@ -1,7 +1,8 @@
 package org.hklrzy.hwind;
 
-import org.hklrzy.hwind.interceptor.InterceptorDefine;
-import org.hklrzy.hwind.interceptor.InterceptorStack;
+import com.google.common.collect.Lists;
+import org.apache.commons.collections4.CollectionUtils;
+import org.hklrzy.hwind.channel.HWindChannel;
 
 import java.util.List;
 
@@ -13,12 +14,6 @@ public class Pack {
 
     private String name;
     private String namespace;
-
-    private List<InterceptorDefine> interceptorDefines;
-    private List<InterceptorStack> interceptorStacks;
-    private List<String> interceptorRefName;
-    private String defaultClassName;
-
     private List<HWindChannel> channels;
 
     public String getName() {
@@ -37,43 +32,20 @@ public class Pack {
         this.namespace = namespace;
     }
 
-    public List<InterceptorDefine> getInterceptorDefines() {
-        return interceptorDefines;
-    }
-
-    public void setInterceptorDefines(List<InterceptorDefine> interceptorDefines) {
-        this.interceptorDefines = interceptorDefines;
-    }
-
-    public String getDefaultClassName() {
-        return defaultClassName;
-    }
-
-    public void setDefaultClassName(String defaultClassName) {
-        this.defaultClassName = defaultClassName;
-    }
-
     public List<HWindChannel> getChannels() {
         return channels;
     }
 
     public void setChannels(List<HWindChannel> channels) {
-        this.channels = channels;
+        if (CollectionUtils.isEmpty(this.channels)) {
+            this.channels = channels;
+        } else {
+            this.channels.addAll(channels);
+        }
     }
 
-    public List<InterceptorStack> getInterceptorStacks() {
-        return interceptorStacks;
+    public void setChannel(HWindChannel channel) {
+        setChannels(Lists.newArrayList(channel));
     }
 
-    public void setInterceptorStacks(List<InterceptorStack> interceptorStacks) {
-        this.interceptorStacks = interceptorStacks;
-    }
-
-    public List<String> getInterceptorRefName() {
-        return interceptorRefName;
-    }
-
-    public void setInterceptorRefName(List<String> interceptorRefName) {
-        this.interceptorRefName = interceptorRefName;
-    }
 }

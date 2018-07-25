@@ -1,7 +1,6 @@
 package org.hklrzy.hwind.channel;
 
 import org.hklrzy.hwind.HWindApplicationContext;
-import org.hklrzy.hwind.HWindChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

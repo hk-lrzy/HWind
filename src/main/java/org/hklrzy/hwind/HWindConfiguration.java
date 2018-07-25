@@ -1,21 +1,19 @@
 package org.hklrzy.hwind;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.collections4.CollectionUtils;
-import org.hklrzy.hwind.constants.HWindConstants;
 import org.hklrzy.hwind.interceptor.InterceptorDefine;
 import org.hklrzy.hwind.interceptor.InterceptorStack;
-import org.hklrzy.hwind.parse.ElementParser;
-import org.hklrzy.hwind.scan.ConfigurationScanner;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
+import org.hklrzy.hwind.parse.BeanParseComposite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.net.URL;
+import javax.servlet.ServletConfig;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -26,76 +24,171 @@ public class HWindConfiguration {
     private static Logger logger =
             LoggerFactory.getLogger(HWindConfiguration.class);
 
-    private static final String DEFAULT_CONFIG_NAME = "hwind.xml";
+    private static final String DEFAULT_CONFIG_FILE_NAME = "hwind.xml";
+    private static final String DEFAULT_CONFIG_NAME = "config";
 
-    private ElementParser elementParser;
+    private String location;
+    private Configuration configuration;
+    private BeanParseComposite beanParseComposite;
 
-    private String path;
-    private List<Pack> packs;
-    private List<InterceptorDefine> interceptorDefines;
-    private List<InterceptorStack> interceptorStacks;
-    private List<String> basePackages;
 
-    public HWindConfiguration(String path) throws Exception {
-        this.path = path;
-        this.elementParser = ElementParser.instance();
-        parseConfiguration();
+    private HWindConfiguration(String path) throws IOException {
+        this.location = path;
+        this.configuration = new Configuration();
+        this.beanParseComposite = BeanParseComposite.initBeanParseComposite();
+        loadAllConfiguration();
     }
 
     /**
-     * 解析配置文件以及扫描目录信息
+     * 获取所有的配置文件
      *
      * @throws Exception
      */
-    private void parseConfiguration() throws Exception {
-        SAXBuilder builder = new SAXBuilder();
-        Document document = builder.build(new File(path));
-        Element root = document.getRootElement();
-        if (root == null) {
-            throw new RuntimeException(String.format("hwind parse path [%s] by SAXBuilder failed", this.path));
-        }
-        this.interceptorDefines = elementParser.parseInterceptorDefines(root.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR_DEFINE));
-        this.interceptorStacks = elementParser.parseInterceptorStacks(root.getChildren(HWindConstants.HWIND_CONFIG_INTERCEPTOR_STACK));
-        this.basePackages = elementParser.parseBasePackages(root.getChildren(HWindConstants.HWINW_CONFIG_SCAN));
-        this.packs = elementParser.parsePacks(root.getChildren(HWindConstants.HWIND_CONFIG_PACK));
-        if (CollectionUtils.isNotEmpty(basePackages)) {
-            ConfigurationScanner configurationScanner = new ConfigurationScanner(this);
-            //configurationScanner.scan();
-        }
+    private void loadAllConfiguration() throws IOException {
+
+        //1. 解析xml文件配置
+        loadConfiguration();
+
+        //2. 解析注解配置
+        //loadAnnotationConfiguration();
+    }
+
+    private void loadConfiguration() {
+        beanParseComposite.parse(location, this);
+    }
+
+    private void loadAnnotationConfiguration() {
+
     }
 
 
-    public static HWindConfiguration newClassPathConfiguration(String config) {
-        config = Strings.isNullOrEmpty(config) ? DEFAULT_CONFIG_NAME : config;
+    public static HWindConfiguration newClassPathConfiguration(ServletConfig servletConfig) {
         try {
-            ClassLoader classLoader = HWindConfiguration.class.getClassLoader();
-            URL resource = classLoader.getResource(config);
-            String path = HWindConfiguration.class.getClassLoader().getResource(config).getPath();
-            return new HWindConfiguration(path);
+            return new HWindConfiguration(getParamPath(servletConfig));
         } catch (Exception e) {
-            logger.error("HWind configuration file [ {} ] not founded", config, e);
-            throw new IllegalArgumentException(e);
+            logger.error("get instance configuration failed ", e);
+            throw new IllegalArgumentException(e.getMessage());
         }
+    }
+
+    private static String getConfig(ServletConfig servletConfig) {
+        return Strings.isNullOrEmpty(servletConfig.getInitParameter(DEFAULT_CONFIG_NAME))
+                ? DEFAULT_CONFIG_FILE_NAME
+                : servletConfig.getInitParameter(DEFAULT_CONFIG_NAME);
+    }
+
+    private static String getParamPath(ServletConfig servletConfig) {
+        return HWindConfiguration.class.getClassLoader().getResource(getConfig(servletConfig)).getPath();
     }
 
 
     public List<InterceptorDefine> getInterceptorDefines() {
-        return interceptorDefines;
+        return configuration.getInterceptorDefines();
+    }
+
+    public InterceptorDefine getInterceptorDefine(String name) {
+        return configuration.getInterceptorDefineMap().get(name);
     }
 
     public List<Pack> getPacks() {
-        return packs;
+        return configuration.packs;
     }
 
     public List<String> getBasePackages() {
-        return basePackages;
+        return configuration.basePackages;
     }
 
     public List<InterceptorStack> getInterceptorStacks() {
-        return interceptorStacks;
+        return configuration.interceptorStacks;
     }
 
-    public void setInterceptorStacks(List<InterceptorStack> interceptorStacks) {
-        this.interceptorStacks = interceptorStacks;
+    public BeanParseComposite getBeanParseComposite() {
+        return beanParseComposite;
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+
+    public void setInterceptorStacks(InterceptorStack interceptorStack) {
+        configuration.setInterceptorStacks(interceptorStack);
+    }
+
+    public void setInterceptorDefine(InterceptorDefine interceptorDefine) {
+        configuration.setInterceptorDefines(interceptorDefine);
+    }
+
+    public void setPack(Pack pack) {
+        configuration.setPacks(Lists.newArrayList(pack));
+    }
+
+    protected class Configuration {
+        private String path;
+        private List<Pack> packs;
+        private Map<String, InterceptorDefine> interceptorDefineMap;
+        private List<InterceptorDefine> interceptorDefines;
+        private List<InterceptorStack> interceptorStacks;
+        private List<String> basePackages;
+
+
+        private Configuration() {
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+        }
+
+        public List<Pack> getPacks() {
+            return packs;
+        }
+
+        public void setPacks(List<Pack> packs) {
+            if (CollectionUtils.isEmpty(this.packs)) {
+                this.packs = packs;
+            } else {
+                this.packs.addAll(packs);
+            }
+        }
+
+        public List<InterceptorDefine> getInterceptorDefines() {
+            return interceptorDefines;
+        }
+
+        public void setInterceptorDefines(InterceptorDefine interceptorDefine) {
+            if (CollectionUtils.isEmpty(interceptorDefines)) {
+                interceptorDefines = Lists.newArrayList();
+                interceptorDefineMap = Maps.newHashMap();
+            }
+            interceptorDefineMap.put(interceptorDefine.getName(), interceptorDefine);
+            interceptorDefines.add(interceptorDefine);
+        }
+
+        public List<InterceptorStack> getInterceptorStacks() {
+            return interceptorStacks;
+        }
+
+        public void setInterceptorStacks(InterceptorStack interceptorStack) {
+            if (CollectionUtils.isEmpty(interceptorStacks)) {
+                interceptorStacks = Lists.newArrayList();
+            }
+            interceptorStacks.add(interceptorStack);
+        }
+
+        public List<String> getBasePackages() {
+            return basePackages;
+        }
+
+        public void setBasePackages(List<String> basePackages) {
+            this.basePackages = basePackages;
+        }
+
+        public Map<String, InterceptorDefine> getInterceptorDefineMap() {
+            return interceptorDefineMap;
+        }
     }
 }

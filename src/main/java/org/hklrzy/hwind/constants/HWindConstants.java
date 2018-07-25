@@ -18,6 +18,8 @@ public class HWindConstants {
 
     public static final String HWIND_CONFIG_METHOD = "method";
 
+    public static final String HWIND_CONFIG_TYPE = "type";
+
     /*拦截器部分开始*/
     public static final String HWIND_CONFIG_INTERCEPTOR = "interceptor";
 

@@ -1,9 +1,10 @@
-package org.hklrzy.hwind;
+package org.hklrzy.hwind.channel;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.hklrzy.hwind.Pack;
 import org.hklrzy.hwind.constants.HWindConstants;
 import org.hklrzy.hwind.utils.RefectionUtils;
 import org.hklrzy.hwind.utils.TypeUtils;
@@ -41,7 +42,7 @@ public class HWindChannel {
 
     private List<String> interceptorRefNames;
 
-    private List<String> requireParams;
+    private List<String> parameterTypeNames;
 
     private Object channelHandler;
 
@@ -197,14 +198,6 @@ public class HWindChannel {
         this.interceptorRefNames = interceptorRefNames;
     }
 
-    public List<String> getRequireParams() {
-        return requireParams;
-    }
-
-    public void setRequireParams(List<String> requireParams) {
-        this.requireParams = requireParams;
-    }
-
     public String[] getParameterNames() {
         return parameterNames;
     }
@@ -227,6 +220,14 @@ public class HWindChannel {
 
     public void setChannelHandler(Object channelHandler) {
         this.channelHandler = channelHandler;
+    }
+
+    public List<String> getParameterTypeNames() {
+        return parameterTypeNames;
+    }
+
+    public void setParameterTypeNames(List<String> parameterTypeNames) {
+        this.parameterTypeNames = parameterTypeNames;
     }
 
     public String getNamespace() {

@@ -2,6 +2,7 @@ package org.hklrzy.hwind;
 
 import com.google.common.collect.Lists;
 import org.hklrzy.hwind.channel.HChannelContext;
+import org.hklrzy.hwind.channel.HWindChannel;
 import org.hklrzy.hwind.interceptor.HInterceptorContext;
 import org.hklrzy.hwind.interceptor.HWindInterceptor;
 import org.hklrzy.hwind.interceptor.HWindInterceptorChain;
@@ -21,7 +22,7 @@ import java.util.List;
  * Created 2018/1/11.
  * Author ke.hao
  */
-public class HWindApplicationContext<T> {
+public class HWindApplicationContext {
     private static Logger logger =
             LoggerFactory.getLogger(HWindApplicationContext.class);
 
@@ -30,7 +31,7 @@ public class HWindApplicationContext<T> {
     private HWindConfiguration configuration;
     private HInterceptorContext interceptorContext;
     private ServletContext servletContext;
-    private WebApplicationContext webApplicationContext;
+    private WebApplicationContext parentContext;
     private HChannelContext channelContext;
     private PathMather pathMather;
 
@@ -50,10 +51,10 @@ public class HWindApplicationContext<T> {
     }
 
     public void init(HWindConfiguration configuration, ServletContext servletContext) {
+        this.parentContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
         this.configuration = configuration;
         this.servletContext = servletContext;
         this.pathMather = new SimplePathMather();
-        this.webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
 
         initFramework(this);
     }
@@ -156,12 +157,12 @@ public class HWindApplicationContext<T> {
         this.servletContext = servletContext;
     }
 
-    public WebApplicationContext getWebApplicationContext() {
-        return webApplicationContext;
+    public WebApplicationContext getParentContext() {
+        return parentContext;
     }
 
-    public void setWebApplicationContext(WebApplicationContext webApplicationContext) {
-        this.webApplicationContext = webApplicationContext;
+    public void setParentContext(WebApplicationContext parentContext) {
+        this.parentContext = parentContext;
     }
 
     public HChannelContext getChannelContext() {

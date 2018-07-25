@@ -1,7 +1,7 @@
 package org.hklrzy.hwind.method.annotation;
 
 import com.alibaba.fastjson.JSONObject;
-import org.hklrzy.hwind.HWindChannel;
+import org.hklrzy.hwind.channel.HWindChannel;
 import org.hklrzy.hwind.HWindModelAndView;
 import org.hklrzy.hwind.method.support.HWindReturnValueHandler;
 import org.springframework.http.HttpStatus;

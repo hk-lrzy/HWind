@@ -2,7 +2,6 @@ package org.hklrzy.hwind.channel;
 
 import com.google.common.collect.Maps;
 import org.hklrzy.hwind.HWindApplicationContext;
-import org.hklrzy.hwind.HWindChannel;
 import org.hklrzy.hwind.HWindConfiguration;
 import org.hklrzy.hwind.Pack;
 import org.hklrzy.hwind.interceptor.HInterceptorContext;

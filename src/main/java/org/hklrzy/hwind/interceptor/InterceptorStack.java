@@ -1,5 +1,8 @@
 package org.hklrzy.hwind.interceptor;
 
+import com.google.common.collect.Lists;
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.List;
 
 /**
@@ -18,9 +21,13 @@ public class InterceptorStack {
 
         private List<String> excludeMapping;
 
-        private List<InterceptorDefine> interceptorDefNames;
+        private InterceptorDefine interceptorDefine;
 
-        private List<String> interceptorRefNames;
+        public InterceptorAdapter(List<String> mapping, List<String> excludeMapping, InterceptorDefine interceptorDefine) {
+            this.mapping = mapping;
+            this.excludeMapping = excludeMapping;
+            this.interceptorDefine = interceptorDefine;
+        }
 
         public List<String> getMapping() {
             return mapping;
@@ -39,20 +46,12 @@ public class InterceptorStack {
         }
 
 
-        public List<InterceptorDefine> getInterceptorDefNames() {
-            return interceptorDefNames;
+        public InterceptorDefine getInterceptorDefine() {
+            return interceptorDefine;
         }
 
-        public void setInterceptorDefNames(List<InterceptorDefine> interceptorDefNames) {
-            this.interceptorDefNames = interceptorDefNames;
-        }
-
-        public List<String> getInterceptorRefNames() {
-            return interceptorRefNames;
-        }
-
-        public void setInterceptorRefNames(List<String> interceptorRefNames) {
-            this.interceptorRefNames = interceptorRefNames;
+        public void setInterceptorDefine(InterceptorDefine interceptorDefine) {
+            this.interceptorDefine = interceptorDefine;
         }
     }
 
@@ -60,8 +59,20 @@ public class InterceptorStack {
         return interceptorAdapters;
     }
 
+    public void setInterceptorAdapters(InterceptorAdapter interceptorAdapter) {
+        if (this.interceptorAdapters == null) {
+            this.interceptorAdapters = Lists.newArrayList();
+        } else {
+            interceptorAdapters.add(interceptorAdapter);
+        }
+    }
+
     public void setInterceptorAdapters(List<InterceptorAdapter> interceptorAdapters) {
-        this.interceptorAdapters = interceptorAdapters;
+        if (CollectionUtils.isEmpty(this.interceptorAdapters)) {
+            this.interceptorAdapters = interceptorAdapters;
+        } else {
+            this.interceptorAdapters.addAll(interceptorAdapters);
+        }
     }
 
 }

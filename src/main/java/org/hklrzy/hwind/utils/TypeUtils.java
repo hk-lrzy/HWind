@@ -3,6 +3,7 @@ package org.hklrzy.hwind.utils;
 import com.google.common.primitives.Primitives;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,23 @@ public class TypeUtils {
             array[index++] = entry.getValue();
         }
         return array;
+    }
+
+    public static String[] toStringArray(List<String> params) {
+        if (validate(params)) {
+            return new String[0];
+        }
+        String[] array = new String[params.size()];
+        int index = 0;
+
+        for (String param : params) {
+            array[index++] = param;
+        }
+        return array;
+    }
+
+    private static boolean validate(Collection<?> collection) {
+        return CollectionUtils.isNotEmpty(collection);
     }
 
 }

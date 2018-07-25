@@ -2,7 +2,6 @@ package org.hklrzy.hwind.channel;
 
 import com.google.common.base.Strings;
 import org.hklrzy.hwind.HWindApplicationContext;
-import org.hklrzy.hwind.HWindChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -19,7 +18,7 @@ public class SpringChannelHandlerFactory extends AbstractChannelHandlerFactory {
     private ApplicationContext applicationContext;
 
     public SpringChannelHandlerFactory(HWindApplicationContext applicationContext) {
-        this.applicationContext = applicationContext.getWebApplicationContext();
+        this.applicationContext = applicationContext.getParentContext();
     }
 
     @Override

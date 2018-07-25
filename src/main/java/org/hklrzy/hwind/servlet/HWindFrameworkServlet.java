@@ -31,7 +31,6 @@ public class HWindFrameworkServlet extends HttpServlet {
     private static Logger logger =
             LoggerFactory.getLogger(HWindFrameworkServlet.class);
 
-    private static final String CONFIG_NAME = "config";
     private HWindApplicationContext applicationContext;
 
     private HWindHandlerAdapter handlerAdapter;
@@ -41,20 +40,18 @@ public class HWindFrameworkServlet extends HttpServlet {
 
     @Override
 
-    public void init(ServletConfig config) throws ServletException {
-        String configFilePath = config.getInitParameter(CONFIG_NAME);
-
+    public void init(ServletConfig servletConfig) throws ServletException {
         /*
             扫描文件以及目录信息
             todo 使用spring.handler来启动配置
          */
-        HWindConfiguration hWindConfiguration = HWindConfiguration.newClassPathConfiguration(configFilePath);
+        HWindConfiguration windConfiguration = HWindConfiguration.newClassPathConfiguration(servletConfig);
 
         /*
             整合基本信息成为上下文
          */
         applicationContext = HWindApplicationContext.getApplicationContext();
-        applicationContext.init(hWindConfiguration, config.getServletContext());
+        applicationContext.init(windConfiguration, servletConfig.getServletContext());
         handlerAdapter = new RequestMappingHandlerAdapter(new ResponseBodyReturnValueHandler());
         viewResolver = new JSTLViewResolver();
 
@@ -116,7 +113,6 @@ public class HWindFrameworkServlet extends HttpServlet {
 
     /**
      * todo 怎么处理view
-     *
      *
      * @param request
      * @param response
