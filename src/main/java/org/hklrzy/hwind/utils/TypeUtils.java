@@ -48,7 +48,7 @@ public class TypeUtils {
     }
 
     public static String[] toStringArray(List<String> params) {
-        if (validate(params)) {
+        if (!validate(params)) {
             return new String[0];
         }
         String[] array = new String[params.size()];

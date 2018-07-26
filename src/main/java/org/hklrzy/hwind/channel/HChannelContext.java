@@ -8,6 +8,7 @@ import org.hklrzy.hwind.interceptor.HInterceptorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -68,7 +69,14 @@ public class HChannelContext {
 
     private void registerChannels(HWindApplicationContext applicationContext) {
         HWindConfiguration configuration = applicationContext.getConfiguration();
-        for (Pack pack : configuration.getPacks()) {
+
+        List<Pack> packs = configuration.getPacks();
+
+        if (packs == null) {
+            return;
+        }
+
+        for (Pack pack : packs) {
             for (HWindChannel channel : pack.getChannels()) {
 
                 channel.setPack(pack);
